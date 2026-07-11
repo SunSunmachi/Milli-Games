@@ -4,18 +4,18 @@
 
 /* ===== CSS変数 ===== */
 :root {
-  --bg-1: #0d001a;
-  --bg-2: #1a0533;
-  --bg-3: #2d0a4e;
+  --bg-1: #1a0a30;
+  --bg-2: #3d1f6e;
+  --bg-3: #5a2d8a;
   --primary: #a855f7;
   --primary-dark: #7c3aed;
-  --primary-light: #c084fc;
-  --primary-glow: rgba(168, 85, 247, 0.3);
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-bg-strong: rgba(255, 255, 255, 0.10);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-border-hover: rgba(255, 255, 255, 0.25);
-  --glass-hover: rgba(255, 255, 255, 0.10);
+  --primary-light: #d8b4fe;
+  --primary-glow: rgba(168, 85, 247, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.10);
+  --glass-bg-strong: rgba(255, 255, 255, 0.16);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-hover: rgba(255, 255, 255, 0.30);
+  --glass-hover: rgba(255, 255, 255, 0.15);
   --glass-blur: 20px;
   --text: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.78);
@@ -176,7 +176,7 @@ ul, ol { list-style: none; }
   display: flex;
   justify-content: center;
   gap: 8px;
-  padding: 80px 16px 16px;
+  padding: 80px 0 16px;
 }
 
 .filter-tab {
@@ -208,6 +208,7 @@ ul, ol { list-style: none; }
 #layout {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* ===== カルーセル ===== */
@@ -215,6 +216,7 @@ ul, ol { list-style: none; }
   position: relative;
   width: 100%;
   padding: 12px 0 8px;
+  margin: 0 auto;
 }
 
 #carousel-container {
@@ -785,7 +787,7 @@ ul, ol { list-style: none; }
 
   #filter-tabs {
     gap: 12px;
-    padding-top: 84px;
+    padding: 84px 0 20px;
   }
 
   .filter-tab {

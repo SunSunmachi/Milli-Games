@@ -25,7 +25,8 @@ const games = [
     points: 50,
     exp: "x1.0",
     tags: ["おすすめ"],
-    link: "games/clicker.html"
+    link: "games/clicker.html",
+    comingSoon: false
   },
   {
     id: 3,
@@ -364,6 +365,7 @@ function snapToNearest() {
 
   var newTranslate = naturalCenter - constrainedPos * specs.cardOffset;
 
+  state.isTransitioning = true;
   el.track.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
   el.track.style.transform = "translateX(" + newTranslate + "px)";
   state.currentTranslate = newTranslate;
@@ -384,8 +386,9 @@ function snapToNearest() {
     }
   }
 
-  // 無限ループ（アニメーション完了後）
+  // アニメーション完了後
   setTimeout(function () {
+    state.isTransitioning = false;
     if (constrainedPos <= 0 || constrainedPos >= total + 1) {
       handleInfiniteLoop();
     }
@@ -399,6 +402,7 @@ function snapToNearest() {
 // 慣性スクロール
 // ============================================
 function applyInertia() {
+  state.isTransitioning = true;
   var friction = 0.95;
   var v = state.velocity;
   var translate = getTranslateX();
@@ -413,6 +417,7 @@ function applyInertia() {
       el.track.style.transition = "none";
       el.track.style.transform = "translateX(" + translate + "px)";
       state.currentTranslate = translate;
+      state.isTransitioning = false;
       snapToNearest();
       return;
     }
