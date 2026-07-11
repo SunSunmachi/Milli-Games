@@ -1091,6 +1091,10 @@ ul, ol { list-style: none; }
   #side-panel {
     display: block !important;
     padding-top: 80px;
+    background: #ff4444 !important;
+    outline: 4px solid #ff0000 !important;
+    color: #fff !important;
+    padding: 80px 20px 20px !important;
   }
 
   .game-card {
