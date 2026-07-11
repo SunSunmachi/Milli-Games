@@ -212,14 +212,23 @@ function generateCards() {
 // ============================================
 function getCardSpecs() {
   var containerWidth = el.container.offsetWidth;
-  var cardWidth = containerWidth * 0.85;
   var gap = 16;
+  // 実際に表示されているカードの幅をCSSから読む
+  var firstCard = el.track.querySelector(".game-card");
+  var cardWidth = firstCard ? firstCard.offsetWidth : containerWidth * 0.85;
   return {
     containerWidth: containerWidth,
     cardWidth: cardWidth,
     gap: gap,
     cardOffset: cardWidth + gap
   };
+}
+
+// ============================================
+// PCかどうか（1024px以上）
+// ============================================
+function isPC() {
+  return window.innerWidth >= 1024;
 }
 
 // ============================================
@@ -485,10 +494,11 @@ function handleDragEnd() {
 }
 
 // ============================================
-// 自動再生
+// 自動再生（PCでは無効）
 // ============================================
 function startAutoPlay() {
   stopAutoPlay();
+  if (isPC()) return;
   if (getFilteredGames().length <= 1) return;
   if (state.isPaused) return;
 
@@ -625,17 +635,20 @@ el.track.addEventListener("touchend", function () {
   handleDragEnd();
 });
 
-// マウスイベント（カルーセル）
+// マウスイベント（カルーセル） - PCでは無効
 el.track.addEventListener("mousedown", function (e) {
+  if (isPC()) return;
   handleDragStart(e.clientX, e.clientY);
   e.preventDefault();
 });
 
 document.addEventListener("mousemove", function (e) {
+  if (!state.isDragging) return;
   handleDragMove(e.clientX);
 });
 
 document.addEventListener("mouseup", function () {
+  if (!state.isDragging) return;
   handleDragEnd();
 });
 
