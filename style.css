@@ -1088,11 +1088,15 @@ ul, ol { list-style: none; }
     display: none;
   }
 
+  #side-menu {
+    display: none;
+  }
+
   #side-panel {
+    display: block !important;
     position: sticky;
     top: 80px;
     align-self: start;
-    display: flex;
     flex-direction: column;
     gap: 12px;
   }
