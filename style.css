@@ -1093,12 +1093,27 @@ ul, ol { list-style: none; }
     padding-top: 80px;
   }
 
-  #side-panel .panel-section {
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: none;
-    padding: 12px 0;
+  #side-panel .panel-section,
+  #side-panel section {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 8px 0 !important;
+    margin-bottom: 4px !important;
+    box-shadow: none !important;
+  }
+
+  #side-panel .panel-title {
+    border-bottom: none;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    font-size: 0.8rem;
+  }
+
+  #side-panel .panel-content {
+    font-size: 0.78rem;
   }
 
   .game-card {
