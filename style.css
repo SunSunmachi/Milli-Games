@@ -1089,7 +1089,7 @@ ul, ol { list-style: none; }
   }
 
   #side-panel {
-    display: block;
+    display: block !important;
     padding-top: 80px;
   }
 
