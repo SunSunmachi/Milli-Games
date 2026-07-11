@@ -1089,12 +1089,13 @@ ul, ol { list-style: none; }
   }
 
   #side-panel {
-    display: block !important;
+    display: block;
     padding-top: 80px;
-    background: #ff4444 !important;
-    outline: 4px solid #ff0000 !important;
-    color: #fff !important;
-    padding: 80px 20px 20px !important;
+  }
+
+  #side-panel .panel-section {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--glass-border);
   }
 
   .game-card {
