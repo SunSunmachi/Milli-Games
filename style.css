@@ -1039,27 +1039,6 @@ ul, ol { list-style: none; }
   }
 }
 
-.back-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  margin-bottom: 16px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--glass-border);
-  background: var(--glass-bg);
-  color: var(--text);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.back-btn:hover {
-  background: var(--glass-hover);
-  border-color: var(--glass-border-hover);
-}
-
 /* ===== タブレット ===== */
 @media (min-width: 768px) {
   .game-card {
@@ -1105,6 +1084,19 @@ ul, ol { list-style: none; }
   #side-panel {
     display: block;
     padding-top: 80px;
+  }
+
+  #side-panel .panel-section {
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    padding: 12px 0;
+    margin-bottom: 8px;
+  }
+
+  #side-panel .panel-title {
+    font-size: 0.85rem;
   }
 
   .game-card {

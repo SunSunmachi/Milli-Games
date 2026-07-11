@@ -105,7 +105,6 @@ const el = {
   volumeLabel: document.getElementById("volume-label"),
   homeView: document.getElementById("home-view"),
   allGamesView: document.getElementById("all-games-view"),
-  backHomeBtn: document.getElementById("back-home-btn"),
   allGamesBtn: document.getElementById("all-games-btn"),
   allGamesList: document.getElementById("all-games-list"),
   allGamesFilters: document.getElementById("all-games-filters"),
@@ -688,7 +687,7 @@ function showAllGames() {
 }
 
 function showHome() {
-  el.homeView.style.display = "";
+  el.homeView.style.display = "block";
   el.allGamesView.style.display = "none";
   el.allGamesBtn.textContent = "全てのゲーム ▾";
   startAutoPlay();
@@ -701,7 +700,6 @@ el.allGamesBtn.addEventListener("click", function () {
     showAllGames();
   }
 });
-el.backHomeBtn.addEventListener("click", showHome);
 
 // 全てのゲーム内フィルタータブ
 el.allGamesFilters.addEventListener("click", function (e) {
