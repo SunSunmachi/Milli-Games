@@ -208,27 +208,24 @@ function generateCards() {
 }
 
 // ============================================
-// カルーセルのサイズ情報を取得
+// カルーセルのサイズ情報を取得（CSSと同期）
 // ============================================
 function getCardSpecs() {
   var containerWidth = el.container.offsetWidth;
   var gap = 16;
-  // 実際に表示されているカードの幅をCSSから読む
-  var firstCard = el.track.querySelector(".game-card");
-  var cardWidth = firstCard ? firstCard.offsetWidth : containerWidth * 0.85;
+  var w = window.innerWidth;
+  var ratio;
+  if (w < 768) ratio = 0.85;
+  else if (w < 1024) ratio = 0.70;
+  else if (w < 1280) ratio = 0.50;
+  else ratio = 0.42;
+  var cardWidth = containerWidth * ratio;
   return {
     containerWidth: containerWidth,
     cardWidth: cardWidth,
     gap: gap,
     cardOffset: cardWidth + gap
   };
-}
-
-// ============================================
-// PCかどうか（1024px以上）
-// ============================================
-function isPC() {
-  return window.innerWidth >= 1024;
 }
 
 // ============================================
@@ -374,7 +371,6 @@ function snapToNearest() {
 
   var newTranslate = naturalCenter - constrainedPos * specs.cardOffset;
 
-  state.isTransitioning = true;
   el.track.style.transition = "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
   el.track.style.transform = "translateX(" + newTranslate + "px)";
   state.currentTranslate = newTranslate;
@@ -397,7 +393,6 @@ function snapToNearest() {
 
   // アニメーション完了後
   setTimeout(function () {
-    state.isTransitioning = false;
     if (constrainedPos <= 0 || constrainedPos >= total + 1) {
       handleInfiniteLoop();
     }
@@ -411,7 +406,6 @@ function snapToNearest() {
 // 慣性スクロール
 // ============================================
 function applyInertia() {
-  state.isTransitioning = true;
   var friction = 0.95;
   var v = state.velocity;
   var translate = getTranslateX();
@@ -426,7 +420,6 @@ function applyInertia() {
       el.track.style.transition = "none";
       el.track.style.transform = "translateX(" + translate + "px)";
       state.currentTranslate = translate;
-      state.isTransitioning = false;
       snapToNearest();
       return;
     }
@@ -494,11 +487,10 @@ function handleDragEnd() {
 }
 
 // ============================================
-// 自動再生（PCでは無効）
+// 自動再生
 // ============================================
 function startAutoPlay() {
   stopAutoPlay();
-  if (isPC()) return;
   if (getFilteredGames().length <= 1) return;
   if (state.isPaused) return;
 
@@ -635,20 +627,17 @@ el.track.addEventListener("touchend", function () {
   handleDragEnd();
 });
 
-// マウスイベント（カルーセル） - PCでは無効
+// マウスイベント（カルーセル）
 el.track.addEventListener("mousedown", function (e) {
-  if (isPC()) return;
   handleDragStart(e.clientX, e.clientY);
   e.preventDefault();
 });
 
 document.addEventListener("mousemove", function (e) {
-  if (!state.isDragging) return;
   handleDragMove(e.clientX);
 });
 
 document.addEventListener("mouseup", function () {
-  if (!state.isDragging) return;
   handleDragEnd();
 });
 
@@ -686,6 +675,10 @@ for (var i = 0; i < el.filterTabs.length; i++) {
 
     state.currentFilter = filter;
     state.currentIndex = 0;
+    state.isPaused = false;
+    state.isDragging = false;
+    state.isTransitioning = false;
+    el.track.classList.remove("dragging");
     stopAutoPlay();
     generateCards();
     updateCarousel(0, false);
