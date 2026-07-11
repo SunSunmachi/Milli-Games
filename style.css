@@ -1115,6 +1115,14 @@ ul, ol { list-style: none; }
     outline: 3px solid orange !important;
   }
 
+  .game-card {
+    background: rgba(0, 0, 255, 0.2) !important;
+  }
+
+  .carousel-arrow {
+    background: rgba(255, 0, 255, 0.5) !important;
+  }
+
   #side-panel .panel-title {
     border-bottom: none;
     margin-bottom: 6px;
