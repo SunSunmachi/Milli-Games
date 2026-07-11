@@ -502,7 +502,7 @@ ul, ol { list-style: none; }
 
 /* ===== サイドパネル ===== */
 #side-panel {
-  display: none;
+  display: block;
 }
 
 .panel-section {
@@ -1036,6 +1036,13 @@ ul, ol { list-style: none; }
 @media (min-width: 900px) {
   #all-games-view .game-table {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ===== モバイル（サイドパネル非表示） ===== */
+@media (max-width: 1023px) {
+  #side-panel {
+    display: none;
   }
 }
 
