@@ -97,14 +97,22 @@ const el = {
   indicators: document.getElementById("carousel-indicators"),
   prevBtn: document.getElementById("carousel-prev"),
   nextBtn: document.getElementById("carousel-next"),
-  filterTabs: document.querySelectorAll(".filter-tab"),
   sideMenu: document.getElementById("side-menu"),
   menuOverlay: document.getElementById("menu-overlay"),
   menuBtn: document.getElementById("menu-btn"),
   closeMenuBtn: document.getElementById("close-menu"),
   volumeSlider: document.getElementById("volume-slider"),
   volumeLabel: document.getElementById("volume-label"),
-  menuNewsList: document.getElementById("menu-news-list"),
+  allGamesBtn: document.getElementById("all-games-btn"),
+  allGamesOverlay: document.getElementById("all-games-overlay"),
+  allGamesClose: document.getElementById("all-games-close"),
+  allGamesList: document.getElementById("all-games-list"),
+  allGamesFilters: document.getElementById("all-games-filters"),
+  popupOverlay: document.getElementById("popup-overlay"),
+  popupClose: document.getElementById("popup-close"),
+  popupTitle: document.getElementById("popup-title"),
+  popupBody: document.getElementById("popup-body"),
+  menuPopupBtns: document.querySelectorAll(".menu-popup-btn"),
 };
 
 // ============================================
@@ -112,7 +120,7 @@ const el = {
 // ============================================
 const state = {
   currentIndex: 0,
-  currentFilter: "すべて",
+  allGamesFilter: "すべて",
   isDragging: false,
   startX: 0,
   startY: 0,
@@ -130,10 +138,7 @@ const state = {
 // 表示するゲームを取得（フィルター）
 // ============================================
 function getFilteredGames() {
-  if (state.currentFilter === "すべて") return games;
-  return games.filter(function (g) {
-    return g.tags.indexOf(state.currentFilter) !== -1;
-  });
+  return games;
 }
 
 // ============================================
@@ -563,15 +568,6 @@ function generateSideContent() {
     newsPanel.innerHTML = html;
   }
 
-  // メニューのお知らせ
-  if (el.menuNewsList) {
-    var html = "";
-    for (var i = 0; i < newsData.length; i++) {
-      html += "<li>" + newsData[i].text + "</li>";
-    }
-    el.menuNewsList.innerHTML = html;
-  }
-
   // ランキング
   var rankingPanel = document.querySelector("#ranking-panel .panel-content");
   if (rankingPanel) {
@@ -661,29 +657,125 @@ el.indicators.addEventListener("click", function (e) {
   }
 });
 
-// フィルタータブ
-for (var i = 0; i < el.filterTabs.length; i++) {
-  el.filterTabs[i].addEventListener("click", function () {
-    var filter = this.getAttribute("data-filter");
-    if (filter === state.currentFilter) return;
+// 全てのゲームモーダル
+function renderAllGamesTable() {
+  var filter = state.allGamesFilter;
+  var filtered = filter === "すべて"
+    ? games
+    : games.filter(function (g) { return g.tags.indexOf(filter) !== -1; });
+  var sorted = filtered.slice().sort(function (a, b) { return b.points - a.points; });
+  var html = "";
+  for (var i = 0; i < sorted.length; i++) {
+    var g = sorted[i];
+    var pts = g.comingSoon ? "???" : g.points + "pt";
+    var exp = g.comingSoon ? "???" : "EXP " + g.exp;
+    html +=
+      '<div class="game-table-row">' +
+      '<span class="game-table-rank">' + (i + 1) + "</span>" +
+      '<span class="game-table-title">' + g.title + "</span>" +
+      '<span class="game-table-points">' + pts + "</span>" +
+      '<span class="game-table-exp">' + exp + "</span>" +
+      "</div>";
+  }
+  if (sorted.length === 0) {
+    html = '<p style="color: var(--text-muted); text-align: center; padding: 24px;">該当するゲームがありません</p>';
+  }
+  el.allGamesList.innerHTML = html;
+}
 
-    // アクティブ切り替え
-    for (var j = 0; j < el.filterTabs.length; j++) {
-      el.filterTabs[j].classList.remove("active");
-    }
-    this.classList.add("active");
+function openAllGames() {
+  state.allGamesFilter = "すべて";
+  el.allGamesOverlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderAllGamesTable();
+}
 
-    state.currentFilter = filter;
-    state.currentIndex = 0;
-    state.isPaused = false;
-    state.isDragging = false;
-    state.isTransitioning = false;
-    el.track.classList.remove("dragging");
-    stopAutoPlay();
-    generateCards();
-    updateCarousel(0, false);
-    startAutoPlay();
-  });
+function closeAllGames() {
+  el.allGamesOverlay.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+el.allGamesBtn.addEventListener("click", openAllGames);
+el.allGamesClose.addEventListener("click", closeAllGames);
+el.allGamesOverlay.addEventListener("click", function (e) {
+  if (e.target === el.allGamesOverlay) closeAllGames();
+});
+
+// 全てのゲーム内フィルタータブ
+el.allGamesFilters.addEventListener("click", function (e) {
+  var tab = e.target.closest(".filter-tab");
+  if (!tab) return;
+  var filter = tab.getAttribute("data-filter");
+  if (filter === state.allGamesFilter) return;
+  var tabs = el.allGamesFilters.querySelectorAll(".filter-tab");
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
+  tab.classList.add("active");
+  state.allGamesFilter = filter;
+  renderAllGamesTable();
+});
+
+// 汎用ポップアップ
+function openPopup(title, contentHtml) {
+  el.popupTitle.textContent = title;
+  el.popupBody.innerHTML = contentHtml;
+  el.popupOverlay.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closePopup() {
+  el.popupOverlay.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+el.popupClose.addEventListener("click", closePopup);
+el.popupOverlay.addEventListener("click", function (e) {
+  if (e.target === el.popupOverlay) closePopup();
+});
+
+// メニューポップアップボタン
+for (var i = 0; i < el.menuPopupBtns.length; i++) {
+  (function (btn) {
+    btn.addEventListener("click", function () {
+      var section = btn.getAttribute("data-section");
+      var title = "";
+      var content = "";
+      if (section === "news") {
+        title = "お知らせ";
+        var html = "";
+        for (var j = 0; j < newsData.length; j++) {
+          html +=
+            '<div class="news-item">' +
+            '<span class="news-date">' + newsData[j].date + "</span>" +
+            '<span class="news-text">' + newsData[j].text + "</span>" +
+            "</div>";
+        }
+        content = html;
+      } else if (section === "ranking") {
+        title = "ランキング";
+        var sorted = games.slice().sort(function (a, b) { return b.points - a.points; });
+        var html = "<h3 class=\"panel-title\">ランキング</h3><ol>";
+        for (var j = 0; j < Math.min(5, sorted.length); j++) {
+          html += "<li>" + sorted[j].title + " - " + sorted[j].points + "pt</li>";
+        }
+        html += "</ol>";
+        content = html;
+      } else if (section === "recent") {
+        title = "最近追加されたゲーム";
+        var recent = games.filter(function (g) { return g.tags.indexOf("新着") !== -1; });
+        var html = "<h3 class=\"panel-title\">最近追加されたゲーム</h3>";
+        for (var j = 0; j < recent.length; j++) {
+          html +=
+            '<div class="recent-item">' +
+            '<span class="recent-title">' + recent[j].title + "</span>" +
+            '<span class="recent-tag">新着</span>' +
+            "</div>";
+        }
+        content = html;
+      }
+      closeMenu();
+      setTimeout(function () { openPopup(title, content); }, 300);
+    });
+  })(el.menuPopupBtns[i]);
 }
 
 // メニュー
@@ -691,10 +783,14 @@ el.menuBtn.addEventListener("click", openMenu);
 el.closeMenuBtn.addEventListener("click", closeMenu);
 el.menuOverlay.addEventListener("click", closeMenu);
 
-// ESCキーでメニューを閉じる
+// ESCキーでメニュー・モーダルを閉じる
 document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
-    if (el.sideMenu.classList.contains("open")) {
+    if (el.popupOverlay.classList.contains("open")) {
+      closePopup();
+    } else if (el.allGamesOverlay.classList.contains("open")) {
+      closeAllGames();
+    } else if (el.sideMenu.classList.contains("open")) {
       closeMenu();
     }
   }

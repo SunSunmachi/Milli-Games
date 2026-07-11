@@ -38,13 +38,6 @@
   <div id="layout">
     <main id="main">
 
-      <!-- フィルタータブ -->
-      <div id="filter-tabs" role="tablist">
-        <button class="filter-tab active" data-filter="すべて" role="tab">すべて</button>
-        <button class="filter-tab" data-filter="おすすめ" role="tab">おすすめ</button>
-        <button class="filter-tab" data-filter="新着" role="tab">新着</button>
-      </div>
-
       <!-- カルーセル -->
       <section id="carousel-section" aria-label="ゲーム一覧">
         <div id="carousel-container">
@@ -57,7 +50,7 @@
 
     </main>
 
-    <!-- サイドパネル（PC用） -->
+    <!-- サイドパネル -->
     <aside id="side-panel">
       <section class="panel-section" id="news-panel">
         <h2 class="panel-title">お知らせ</h2>
@@ -74,6 +67,36 @@
     </aside>
   </div>
 
+  <!-- 全てのゲームボタン -->
+  <button id="all-games-btn" class="fab" aria-label="全てのゲーム">全てのゲーム ▾</button>
+
+  <!-- 全てのゲームモーダル -->
+  <div id="all-games-overlay" class="modal-overlay">
+    <div id="all-games-modal" class="modal">
+      <div class="modal-header">
+        <h2>全てのゲーム</h2>
+        <button class="modal-close" id="all-games-close" aria-label="閉じる">&times;</button>
+      </div>
+      <div id="all-games-filters" class="filter-tabs">
+        <button class="filter-tab active" data-filter="すべて">すべて</button>
+        <button class="filter-tab" data-filter="おすすめ">おすすめ</button>
+        <button class="filter-tab" data-filter="新着">新着</button>
+      </div>
+      <div id="all-games-list" class="game-table"></div>
+    </div>
+  </div>
+
+  <!-- 汎用ポップアップモーダル -->
+  <div id="popup-overlay" class="modal-overlay">
+    <div id="popup-modal" class="modal">
+      <div class="modal-header">
+        <h2 id="popup-title"></h2>
+        <button class="modal-close" id="popup-close" aria-label="閉じる">&times;</button>
+      </div>
+      <div id="popup-body"></div>
+    </div>
+  </div>
+
   <!-- メニューオーバーレイ -->
   <div id="menu-overlay"></div>
 
@@ -85,8 +108,10 @@
     </div>
     <div id="side-menu-body">
       <section class="menu-section">
-        <h3>お知らせ</h3>
-        <ul id="menu-news-list"></ul>
+        <h3>情報</h3>
+        <button class="menu-popup-btn" data-section="news">お知らせ</button>
+        <button class="menu-popup-btn" data-section="ranking">ランキング</button>
+        <button class="menu-popup-btn" data-section="recent">最近追加されたゲーム</button>
       </section>
       <section class="menu-section">
         <h3>設定</h3>
