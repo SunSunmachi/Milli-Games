@@ -38,15 +38,28 @@
   <div id="layout">
     <main id="main">
 
-      <!-- カルーセル -->
-      <section id="carousel-section" aria-label="ゲーム一覧">
-        <div id="carousel-container">
-          <div id="carousel-track" role="list"></div>
+      <!-- ホーム画面 -->
+      <div id="home-view">
+        <section id="carousel-section" aria-label="ゲーム一覧">
+          <div id="carousel-container">
+            <div id="carousel-track" role="list"></div>
+          </div>
+          <button id="carousel-prev" class="carousel-arrow" aria-label="前のゲーム">&#8249;</button>
+          <button id="carousel-next" class="carousel-arrow" aria-label="次のゲーム">&#8250;</button>
+          <div id="carousel-indicators" role="tablist" aria-label="スライド選択"></div>
+        </section>
+      </div>
+
+      <!-- 全ゲーム画面 -->
+      <div id="all-games-view" style="display: none;">
+        <button id="back-home-btn" class="back-btn">← ホームに戻る</button>
+        <div id="all-games-filters" class="filter-tabs">
+          <button class="filter-tab active" data-filter="すべて">すべて</button>
+          <button class="filter-tab" data-filter="おすすめ">おすすめ</button>
+          <button class="filter-tab" data-filter="新着">新着</button>
         </div>
-        <button id="carousel-prev" class="carousel-arrow" aria-label="前のゲーム">&#8249;</button>
-        <button id="carousel-next" class="carousel-arrow" aria-label="次のゲーム">&#8250;</button>
-        <div id="carousel-indicators" role="tablist" aria-label="スライド選択"></div>
-      </section>
+        <div id="all-games-list" class="game-table"></div>
+      </div>
 
     </main>
 
@@ -69,22 +82,6 @@
 
   <!-- 全てのゲームボタン -->
   <button id="all-games-btn" class="fab" aria-label="全てのゲーム">全てのゲーム ▾</button>
-
-  <!-- 全てのゲームモーダル -->
-  <div id="all-games-overlay" class="modal-overlay">
-    <div id="all-games-modal" class="modal">
-      <div class="modal-header">
-        <h2>全てのゲーム</h2>
-        <button class="modal-close" id="all-games-close" aria-label="閉じる">&times;</button>
-      </div>
-      <div id="all-games-filters" class="filter-tabs">
-        <button class="filter-tab active" data-filter="すべて">すべて</button>
-        <button class="filter-tab" data-filter="おすすめ">おすすめ</button>
-        <button class="filter-tab" data-filter="新着">新着</button>
-      </div>
-      <div id="all-games-list" class="game-table"></div>
-    </div>
-  </div>
 
   <!-- 汎用ポップアップモーダル -->
   <div id="popup-overlay" class="modal-overlay">

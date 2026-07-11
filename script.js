@@ -103,9 +103,10 @@ const el = {
   closeMenuBtn: document.getElementById("close-menu"),
   volumeSlider: document.getElementById("volume-slider"),
   volumeLabel: document.getElementById("volume-label"),
+  homeView: document.getElementById("home-view"),
+  allGamesView: document.getElementById("all-games-view"),
+  backHomeBtn: document.getElementById("back-home-btn"),
   allGamesBtn: document.getElementById("all-games-btn"),
-  allGamesOverlay: document.getElementById("all-games-overlay"),
-  allGamesClose: document.getElementById("all-games-close"),
   allGamesList: document.getElementById("all-games-list"),
   allGamesFilters: document.getElementById("all-games-filters"),
   popupOverlay: document.getElementById("popup-overlay"),
@@ -657,7 +658,7 @@ el.indicators.addEventListener("click", function (e) {
   }
 });
 
-// 全てのゲームモーダル
+// 全ゲーム画面切り替え
 function renderAllGamesTable() {
   var filter = state.allGamesFilter;
   var filtered = filter === "すべて"
@@ -683,23 +684,34 @@ function renderAllGamesTable() {
   el.allGamesList.innerHTML = html;
 }
 
-function openAllGames() {
+function showAllGames() {
   state.allGamesFilter = "すべて";
-  el.allGamesOverlay.classList.add("open");
-  document.body.style.overflow = "hidden";
+  el.homeView.style.display = "none";
+  el.allGamesView.style.display = "block";
+  el.allGamesBtn.textContent = "← ホームに戻る";
+  stopAutoPlay();
   renderAllGamesTable();
+  // フィルタータブをリセット
+  var tabs = el.allGamesFilters.querySelectorAll(".filter-tab");
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
+  tabs[0].classList.add("active");
 }
 
-function closeAllGames() {
-  el.allGamesOverlay.classList.remove("open");
-  document.body.style.overflow = "";
+function showHome() {
+  el.homeView.style.display = "";
+  el.allGamesView.style.display = "none";
+  el.allGamesBtn.textContent = "全てのゲーム ▾";
+  startAutoPlay();
 }
 
-el.allGamesBtn.addEventListener("click", openAllGames);
-el.allGamesClose.addEventListener("click", closeAllGames);
-el.allGamesOverlay.addEventListener("click", function (e) {
-  if (e.target === el.allGamesOverlay) closeAllGames();
+el.allGamesBtn.addEventListener("click", function () {
+  if (el.allGamesView.style.display === "block") {
+    showHome();
+  } else {
+    showAllGames();
+  }
 });
+el.backHomeBtn.addEventListener("click", showHome);
 
 // 全てのゲーム内フィルタータブ
 el.allGamesFilters.addEventListener("click", function (e) {
@@ -788,8 +800,8 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
     if (el.popupOverlay.classList.contains("open")) {
       closePopup();
-    } else if (el.allGamesOverlay.classList.contains("open")) {
-      closeAllGames();
+    } else if (el.allGamesView.style.display === "block") {
+      showHome();
     } else if (el.sideMenu.classList.contains("open")) {
       closeMenu();
     }
