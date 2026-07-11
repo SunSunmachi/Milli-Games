@@ -664,21 +664,11 @@ function renderAllGamesTable() {
   var filtered = filter === "すべて"
     ? games
     : games.filter(function (g) { return g.tags.indexOf(filter) !== -1; });
-  var sorted = filtered.slice().sort(function (a, b) { return b.points - a.points; });
   var html = "";
-  for (var i = 0; i < sorted.length; i++) {
-    var g = sorted[i];
-    var pts = g.comingSoon ? "???" : g.points + "pt";
-    var exp = g.comingSoon ? "???" : "EXP " + g.exp;
-    html +=
-      '<div class="game-table-row">' +
-      '<span class="game-table-rank">' + (i + 1) + "</span>" +
-      '<span class="game-table-title">' + g.title + "</span>" +
-      '<span class="game-table-points">' + pts + "</span>" +
-      '<span class="game-table-exp">' + exp + "</span>" +
-      "</div>";
+  for (var i = 0; i < filtered.length; i++) {
+    html += createCardHTML(filtered[i]);
   }
-  if (sorted.length === 0) {
+  if (filtered.length === 0) {
     html = '<p style="color: var(--text-muted); text-align: center; padding: 24px;">該当するゲームがありません</p>';
   }
   el.allGamesList.innerHTML = html;
