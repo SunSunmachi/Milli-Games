@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Milli Games</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 背景アニメーション -->
+  <div id="bg-blur">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- ヘッダー（固定） -->
+  <header id="header" class="glass">
+    <div id="header-inner">
+      <div id="header-logo">Milli Games</div>
+      <div id="header-actions">
+        <button id="profile-btn" class="icon-btn" aria-label="プロフィール">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+          </svg>
+        </button>
+        <button id="menu-btn" class="icon-btn" aria-label="メニュー">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインレイアウト -->
+  <div id="layout">
+    <main id="main">
+
+      <!-- フィルタータブ -->
+      <div id="filter-tabs" role="tablist">
+        <button class="filter-tab active" data-filter="すべて" role="tab">すべて</button>
+        <button class="filter-tab" data-filter="おすすめ" role="tab">おすすめ</button>
+        <button class="filter-tab" data-filter="新着" role="tab">新着</button>
+      </div>
+
+      <!-- カルーセル -->
+      <section id="carousel-section" aria-label="ゲーム一覧">
+        <div id="carousel-container">
+          <div id="carousel-track" role="list"></div>
+        </div>
+        <button id="carousel-prev" class="carousel-arrow" aria-label="前のゲーム">&#8249;</button>
+        <button id="carousel-next" class="carousel-arrow" aria-label="次のゲーム">&#8250;</button>
+        <div id="carousel-indicators" role="tablist" aria-label="スライド選択"></div>
+      </section>
+
+    </main>
+
+    <!-- サイドパネル（PC用） -->
+    <aside id="side-panel">
+      <section class="panel-section" id="news-panel">
+        <h2 class="panel-title">お知らせ</h2>
+        <div class="panel-content"></div>
+      </section>
+      <section class="panel-section" id="ranking-panel">
+        <h2 class="panel-title">ランキング</h2>
+        <div class="panel-content"></div>
+      </section>
+      <section class="panel-section" id="recent-panel">
+        <h2 class="panel-title">最近追加されたゲーム</h2>
+        <div class="panel-content"></div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- メニューオーバーレイ -->
+  <div id="menu-overlay"></div>
+
+  <!-- サイドメニュー -->
+  <nav id="side-menu" class="glass" aria-label="メインメニュー">
+    <div id="side-menu-header">
+      <h2>メニュー</h2>
+      <button id="close-menu" class="icon-btn" aria-label="メニューを閉じる">&times;</button>
+    </div>
+    <div id="side-menu-body">
+      <section class="menu-section">
+        <h3>お知らせ</h3>
+        <ul id="menu-news-list"></ul>
+      </section>
+      <section class="menu-section">
+        <h3>設定</h3>
+        <div class="setting-item">
+          <label for="volume-slider">効果音 音量</label>
+          <div class="volume-control">
+            <input type="range" id="volume-slider" min="0" max="100" step="20" value="80">
+            <span id="volume-label">80%</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </nav>
+
+  <script src="script.js"></script>
+</body>
+</html>
