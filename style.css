@@ -1094,8 +1094,8 @@ ul, ol { list-style: none; }
   }
 
   #side-panel {
-    background: transparent !important;
-    border: none !important;
+    background: rgba(255, 0, 0, 0.5) !important;
+    outline: 4px solid blue !important;
   }
 
   #side-panel .panel-section,
@@ -1108,6 +1108,11 @@ ul, ol { list-style: none; }
     padding: 8px 0 !important;
     margin-bottom: 4px !important;
     box-shadow: none !important;
+  }
+
+  #side-menu {
+    background: rgba(255, 255, 0, 0.5) !important;
+    outline: 3px solid orange !important;
   }
 
   #side-panel .panel-title {
