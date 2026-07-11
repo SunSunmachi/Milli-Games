@@ -1086,19 +1086,6 @@ ul, ol { list-style: none; }
     padding-top: 80px;
   }
 
-  #side-panel .panel-section {
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: none;
-    padding: 12px 0;
-    margin-bottom: 8px;
-  }
-
-  #side-panel .panel-title {
-    font-size: 0.85rem;
-  }
-
   .game-card {
     flex: 0 0 50%;
   }
