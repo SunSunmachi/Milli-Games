@@ -4,31 +4,31 @@
 
 /* ===== CSS変数 ===== */
 :root {
-  --bg-1: #1a0a30;
-  --bg-2: #3d1f6e;
-  --bg-3: #5a2d8a;
-  --primary: #a855f7;
-  --primary-dark: #7c3aed;
-  --primary-light: #d8b4fe;
-  --primary-glow: rgba(168, 85, 247, 0.4);
-  --glass-bg: rgba(255, 255, 255, 0.10);
-  --glass-bg-strong: rgba(255, 255, 255, 0.16);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-border-hover: rgba(255, 255, 255, 0.30);
-  --glass-hover: rgba(255, 255, 255, 0.15);
+  --bg-1: #f0ebf5;
+  --bg-2: #e4d6ed;
+  --bg-3: #d8c4e5;
+  --primary: #8582fb;
+  --primary-dark: #716ed5;
+  --primary-light: #dbbee1;
+  --primary-glow: rgba(133, 130, 251, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-strong: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.50);
+  --glass-border-hover: rgba(255, 255, 255, 0.70);
+  --glass-hover: rgba(255, 255, 255, 0.35);
   --glass-blur: 20px;
-  --text: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.78);
-  --text-muted: rgba(255, 255, 255, 0.45);
+  --text: #2d1b4e;
+  --text-secondary: rgba(45, 27, 78, 0.70);
+  --text-muted: rgba(45, 27, 78, 0.45);
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
   --radius-full: 999px;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 30px var(--primary-glow);
+  --shadow-sm: 0 2px 8px rgba(45, 27, 78, 0.08);
+  --shadow-md: 0 4px 16px rgba(45, 27, 78, 0.12);
+  --shadow-lg: 0 8px 32px rgba(45, 27, 78, 0.16);
+  --shadow-glow: 0 0 24px var(--primary-glow);
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -78,7 +78,7 @@ ul, ol { list-style: none; }
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.30;
+  opacity: 0.18;
   animation: blobFloat 20s ease-in-out infinite;
   will-change: transform;
 }
@@ -331,11 +331,11 @@ ul, ol { list-style: none; }
 }
 
 .coming-soon-badge {
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(45, 27, 78, 0.7);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--text);
+  color: #fff;
 }
 
 /* カード本文 */
@@ -389,7 +389,7 @@ ul, ol { list-style: none; }
 .card-points,
 .card-exp {
   padding: 3px 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border: 1px dashed rgba(45, 27, 78, 0.20);
   border-radius: var(--radius-sm);
   font-size: 0.78rem;
   color: var(--text-secondary);
@@ -444,7 +444,7 @@ ul, ol { list-style: none; }
   height: 44px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--text);
@@ -488,7 +488,7 @@ ul, ol { list-style: none; }
   height: 8px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(45, 27, 78, 0.20);
   cursor: pointer;
   transition: var(--transition);
   padding: 0;
