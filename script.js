@@ -77,6 +77,16 @@ const games = [
     exp: "x1.2",
     tags: ["新着"],
     comingSoon: true
+  },
+  {
+    id: 8,
+    title: "リズムゲーム",
+    description: "落ちてくるノーツにタイミングを合わせてタップする音ゲー。4段階判定でハイスコアを目指せ！",
+    image: "https://picsum.photos/seed/rhythm/400/250",
+    points: 150,
+    exp: "x1.3",
+    tags: ["おすすめ", "新着"],
+    link: "games/music.html"
   }
 ];
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>リズムゲーム - Milli Games</title>
+  <meta name="description" content="ブラウザで遊べる無料の音ゲー。落ちてくるノーツにタイミングを合わせてタップ！">
+  <link rel="stylesheet" href="music.css">
+</head>
+<body style="margin:0;min-height:100vh;background:linear-gradient(135deg,#0d001a,#1a0a2e);color:#fff;font-family:'Helvetica Neue',Arial,'Hiragino Kaku Gothic ProN',sans-serif;display:flex;flex-direction:column;align-items:center;">
+
+  <div style="width:100%;max-width:500px;padding:16px;box-sizing:border-box;">
+    <a href="../index.html" style="color:#bb86fc;text-decoration:none;font-size:0.9rem;">&larr; Milli Games に戻る</a>
+  </div>
+
+  <div class="game-page" style="width:100%;max-width:500px;padding:0 16px 32px;box-sizing:border-box;">
+    <h1 style="font-size:1.5rem;margin:0 0 8px;">リズムゲーム</h1>
+    <p style="font-size:0.9rem;color:#aaa;margin:0 0 16px;">ノーツが判定ラインに来たらタイミングよくタップ！</p>
+
+    <div class="game-container">
+      <div class="score-area">
+        <div class="score-box">
+          <span class="score-label">スコア</span>
+          <span class="score-value" id="score">0</span>
+        </div>
+        <div class="score-box">
+          <span class="score-label">ベスト</span>
+          <span class="score-value" id="best-score">0</span>
+        </div>
+        <button class="btn-new-game" id="btn-new-game">New Game</button>
+      </div>
+
+      <div class="game-hud">
+        <div class="hud-item">
+          <span class="hud-label">COMBO</span>
+          <span class="hud-value" id="combo">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">判定</span>
+          <span class="hud-value" id="judge">-</span>
+        </div>
+      </div>
+
+      <div class="board-wrapper">
+        <canvas id="game-canvas"></canvas>
+
+        <div class="lane-buttons" id="lane-buttons">
+          <button class="lane-btn" data-lane="0">D</button>
+          <button class="lane-btn" data-lane="1">F</button>
+          <button class="lane-btn" data-lane="2">J</button>
+          <button class="lane-btn" data-lane="3">K</button>
+        </div>
+
+        <div class="game-overlay" id="game-over-overlay">
+          <div class="overlay-content">
+            <h2>リザルト</h2>
+            <p>スコア: <span id="final-score">0</span></p>
+            <div class="result-detail" id="result-detail"></div>
+            <p class="best-result" id="best-result"></p>
+            <button class="btn-primary" id="btn-retry">もう一度遊ぶ</button>
+          </div>
+        </div>
+
+        <div class="game-overlay active" id="game-start-overlay">
+          <div class="overlay-content">
+            <h2>リズムゲーム</h2>
+            <p>ノーツが判定ラインに来たら<br>タイミングよくタップ！</p>
+            <button class="btn-primary" id="btn-start">ゲームスタート</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,0.05);border-radius:8px;font-size:0.85rem;color:#aaa;">
+      <h3 style="margin:0 0 8px;font-size:1rem;color:#bb86fc;">遊び方</h3>
+      <ul style="margin:0;padding-left:20px;line-height:1.8;">
+        <li><strong>PC</strong>: D, F, J, K キー</li>
+        <li><strong>スマホ</strong>: 画面下の4つのボタンをタップ</li>
+        <li>PERFECT &gt; GREAT &gt; GOOD &gt; MISS の4段階判定</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="music.js"></script>
+</body>
+</html>

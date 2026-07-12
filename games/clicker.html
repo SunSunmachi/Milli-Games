@@ -1,491 +1,516 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>クリッカーヒーロー - Milli Games</title>
-  <style>
-    /* ===== このファイル1つで完結しています ===== */
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ミリプロ風クリッカー - Aim for a Million!</title>
+    <style>
+        :root {
+            --primary-color: #ff8fb6;
+            --secondary-color: #8be0ff;
+            --dark-bg: #222;
+            --border-color: #ccc;
+        }
 
-    /* ===== CSS変数 ===== */
-    :root {
-      --bg-1: #f0ebf5;
-      --bg-2: #e4d6ed;
-      --bg-3: #d8c4e5;
-      --primary: #8582fb;
-      --primary-dark: #716ed5;
-      --primary-light: #dbbee1;
-      --glass-bg: rgba(255,255,255,0.25);
-      --glass-border: rgba(255,255,255,0.50);
-      --glass-blur: 20px;
-      --text: #2d1b4e;
-      --text-secondary: rgba(45,27,78,0.70);
-      --text-muted: rgba(45,27,78,0.45);
-      --radius-sm: 8px;
-      --radius-md: 16px;
-      --radius-lg: 24px;
-      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-    /* ===== リセット ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
-    body {
-      font-family: var(--font);
-      background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
-      color: var(--text);
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    button { font-family: inherit; cursor: pointer; }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffeef4, #eef9ff);
+            color: #333;
+            overflow: hidden;
+        }
 
-    /* ===== ヘッダー ===== */
-    header {
-      background: var(--glass-bg);
-      backdrop-filter: blur(var(--glass-blur));
-      -webkit-backdrop-filter: blur(var(--glass-blur));
-      border-bottom: 1px solid var(--glass-border);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    header a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: var(--transition);
-    }
-    header a:hover { color: var(--text); }
-    header span {
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
+        /* 2カラムレイアウト（PC向け） */
+        #left-panel {
+            flex: 4;
+            background: linear-gradient(to bottom, rgba(255,143,182,0.1), rgba(139,224,255,0.1));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.05);
+            position: relative;
+        }
 
-    /* ===== メイン ===== */
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 20px;
-      gap: 24px;
-    }
+        #right-panel {
+            flex: 6;
+            max-width: 600px;
+            background-color: #fff;
+            border-left: 2px solid var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-    /* ===== ゲームUI ===== */
-    #game-ui {
-      display: flex;
-      gap: 24px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(var(--glass-blur));
-      -webkit-backdrop-filter: blur(var(--glass-blur));
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: 16px 32px;
-      width: 100%;
-      max-width: 400px;
-      justify-content: center;
-    }
-    .stat {
-      text-align: center;
-    }
-    .stat-label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .stat-value {
-      display: block;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-    #combo-value.combo-active {
-      color: #fbbf24;
-      text-shadow: 0 0 20px rgba(251,191,36,0.5);
-    }
+        /* スマホ向けレイアウト（画面幅が768px以下の場合） */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto; /* スマホでは全体をスクロール可能に */
+                height: auto;
+                min-height: 100vh;
+            }
+            #left-panel {
+                flex: none;
+                height: 50vh; /* 画面の上半分をクリックエリアに */
+                border-right: none;
+                border-bottom: 2px solid var(--primary-color);
+            }
+            #right-panel {
+                flex: none;
+                max-width: 100%;
+                height: auto;
+                border-left: none;
+            }
+        }
 
-    /* ===== クリックボタン ===== */
-    #click-btn {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 2px solid var(--glass-border);
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      font-size: 1.8rem;
-      font-weight: 800;
-      box-shadow: 0 8px 40px rgba(168,85,247,0.4), inset 0 2px 0 rgba(255,255,255,0.2);
-      transition: transform 0.1s ease, box-shadow var(--transition);
-      position: relative;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
-    #click-btn::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    #click-btn:active {
-      transform: scale(0.92);
-    }
-    #click-btn .label-small {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 500;
-      opacity: 0.8;
-      margin-top: 4px;
-    }
+        /* 左パネル：メインクリックエリア */
+        .agency-name {
+            position: absolute;
+            top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #555;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
 
-    /* ===== スタートボタン ===== */
-    #start-btn {
-      padding: 14px 48px;
-      border-radius: var(--radius-md);
-      border: none;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      transition: var(--transition);
-      box-shadow: 0 4px 20px rgba(168,85,247,0.3);
-    }
-    #start-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 28px rgba(168,85,247,0.5);
-    }
-    #start-btn:active { transform: translateY(0); }
+        .stats-box {
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            margin-top: 50px;
+        }
 
-    /* ===== 結果画面 ===== */
-    #result {
-      background: var(--glass-bg);
-      backdrop-filter: blur(var(--glass-blur));
-      -webkit-backdrop-filter: blur(var(--glass-blur));
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 32px 40px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 340px;
-      width: 100%;
-    }
-    #result.hidden { display: none; }
-    #result h2 {
-      font-size: 1.3rem;
-      margin-bottom: 4px;
-    }
-    #result .result-score {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--primary-light);
-    }
-    #result .result-label {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-    #result .result-combo {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-    #result .result-combo span { color: #fbbf24; font-weight: 700; }
+        .views-count {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 5px 0;
+            word-break: break-all;
+        }
 
-    #play-again-btn {
-      margin-top: 8px;
-      padding: 12px 32px;
-      border-radius: var(--radius-md);
-      border: none;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 700;
-      transition: var(--transition);
-      box-shadow: 0 4px 16px rgba(168,85,247,0.3);
-    }
-    #play-again-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(168,85,247,0.5);
-    }
+        .vps-count, .click-power {
+            font-size: 1rem;
+            color: #666;
+            margin: 2px 0;
+        }
 
-    .hidden { display: none !important; }
-  </style>
+        .main-button {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary-color) 0%, #ff6b9d 100%);
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 143, 182, 0.5);
+            transition: transform 0.05s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            -webkit-tap-highlight-color: transparent; /* スマホタップ時の青枠を消す */
+        }
+
+        .main-button:active {
+            transform: scale(0.95);
+        }
+
+        .click-particle {
+            position: absolute;
+            font-weight: bold;
+            color: var(--primary-color);
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 2px white;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+        }
+
+        /* 右パネル：目標と進行状況（上部） */
+        .goal-container {
+            width: 100%;
+            background: var(--dark-bg);
+            padding: 15px 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .goal-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 25px;
+            background: #444;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #666;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        /* 右パネル：アップグレードエリア（下部） */
+        .shop-header {
+            text-align: center;
+            padding: 10px;
+            background: #eee;
+            color: #333;
+            font-size: 1rem;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .upgrades-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            margin: 0;
+            background: #f9f9f9;
+        }
+
+        .upgrade-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px;
+            background-color: white;
+            border: none;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            text-align: left;
+        }
+
+        .upgrade-btn:hover:not(:disabled) {
+            background-color: #f0f8ff;
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+
+        .upgrade-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 45px;
+            text-align: center;
+        }
+
+        .upgrade-info {
+            flex: 1;
+        }
+
+        .upgrade-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .upgrade-cost {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+
+        .upgrade-desc {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .upgrade-count {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: rgba(0,0,0,0.08);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* クリア画面 */
+        #clear-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .clear-title {
+            font-size: 3rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+        .clear-btn {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 30px;
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+    </style>
 </head>
 <body>
 
-  <!-- ヘッダー：戻るリンク -->
-  <header>
-    <a href="../index.html">&larr; Milli Games に戻る</a>
-    <span>クリッカーヒーロー</span>
-  </header>
-
-  <!-- メインゲームエリア -->
-  <main>
-    <!-- スコア・時間・コンボ表示 -->
-    <div id="game-ui">
-      <div class="stat">
-        <span class="stat-label">スコア</span>
-        <span id="score-value" class="stat-value">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">残り時間</span>
-        <span id="timer-value" class="stat-value">10</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">コンボ</span>
-        <span id="combo-value" class="stat-value">x1</span>
-      </div>
+    <div id="left-panel">
+        <div class="agency-name">Million Production</div>
+        <div class="stats-box">
+            <div class="views-count"><span id="views">0</span> 再生</div>
+            <div class="vps-count">自動再生: <span id="vps">0</span> /秒</div>
+            <div class="click-power">クリック力: <span id="click-power-display">1</span> /タップ</div>
+        </div>
+        
+        <button id="main-btn" class="main-button">
+            ▶️<br>投稿
+        </button>
     </div>
 
-    <!-- クリックボタン -->
-    <button id="click-btn" class="hidden">
-      タップ！
-      <span class="label-small">連打しろ！</span>
-    </button>
+    <div id="right-panel">
+        <div class="goal-container">
+            <div class="goal-title">目標：ミリオン（100万再生）達成！</div>
+            <div class="progress-bar-bg">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+                <div id="progress-text" class="progress-text">0.00%</div>
+            </div>
+        </div>
 
-    <!-- スタートボタン -->
-    <button id="start-btn">ゲームスタート</button>
-
-    <!-- 結果画面 -->
-    <div id="result" class="hidden">
-      <h2>結果</h2>
-      <p class="result-label">最終スコア</p>
-      <p class="result-score" id="final-score">0</p>
-      <p class="result-combo">最大コンボ: <span id="max-combo">x1</span></p>
-      <button id="play-again-btn">もう一度遊ぶ</button>
+        <div class="shop-header">アップグレード一覧</div>
+        <div class="upgrades-container" id="upgrades-container"></div>
     </div>
-  </main>
 
-  <script>
-    // ============================================
-    // ゲーム「クリッカーヒーロー」
-    // このファイルだけで動きます
-    // ============================================
-    "use strict";
+    <div id="clear-modal">
+        <div class="clear-title">🎊 100万再生達成！ 🎊</div>
+        <h2>Million Production 大成功！</h2>
+        <p>あなたは立派なプロデューサーです。</p>
+        <button class="clear-btn" onclick="continueGame()">さらに上を目指す</button>
+    </div>
 
-    // ============================================
-    // 1. 音量をメインページから取得
-    // ============================================
-    function getVolume() {
-      var saved = localStorage.getItem("milli-volume");
-      return saved !== null ? parseInt(saved) / 100 : 0.8;
-    }
+    <script>
+        let views = 0;
+        let vps = 0; 
+        let clickPower = 1; 
+        let isCleared = false; 
+        const GOAL_VIEWS = 1000000; 
 
-    // ============================================
-    // 2. 効果音（Web Audio API）
-    // ============================================
-    var audioCtx = null;
+        // アップグレードの細分化とバリエーション追加
+        const upgrades = [
+            // レベルの細かいマウス強化（クリック系）
+            { id: 0, name: "マウス強化 Lv.1", icon: "🖱️", baseCost: 15, type: 'click', value: 1, count: 0, desc: "クリック力 +1" },
+            { id: 1, name: "SNSアカウント開設", icon: "📱", baseCost: 50, type: 'auto', value: 1, count: 0, desc: "自動再生 +1/秒" },
+            { id: 2, name: "マウス強化 Lv.2", icon: "🖱️", baseCost: 150, type: 'click', value: 3, count: 0, desc: "クリック力 +3" },
+            { id: 3, name: "ショート動画投稿", icon: "⏱️", baseCost: 300, type: 'auto', value: 5, count: 0, desc: "自動再生 +5/秒" },
+            { id: 4, name: "マウス強化 Lv.3", icon: "🖱️", baseCost: 800, type: 'click', value: 10, count: 0, desc: "クリック力 +10" },
+            { id: 5, name: "サムネ研究", icon: "🖼️", baseCost: 2000, type: 'click', value: 20, count: 0, desc: "クリック力 +20" },
+            { id: 6, name: "専属エディター", icon: "🎬", baseCost: 3500, type: 'auto', value: 25, count: 0, desc: "自動再生 +25/秒" },
+            { id: 7, name: "マウス強化 Lv.4", icon: "🖱️", baseCost: 6000, type: 'click', value: 50, count: 0, desc: "クリック力 +50" },
+            { id: 8, name: "歌ってみた動画", icon: "🎤", baseCost: 12000, type: 'auto', value: 80, count: 0, desc: "自動再生 +80/秒" },
+            { id: 9, name: "ゲーミングPC導入", icon: "💻", baseCost: 25000, type: 'click', value: 150, count: 0, desc: "クリック力 +150" },
+            { id: 10, name: "ゲーム実況配信", icon: "🎮", baseCost: 45000, type: 'auto', value: 200, count: 0, desc: "自動再生 +200/秒" },
+            { id: 11, name: "バズり企画実行", icon: "✨", baseCost: 80000, type: 'click', value: 400, count: 0, desc: "クリック力 +400" },
+            { id: 12, name: "プロモーション広告", icon: "📢", baseCost: 150000, type: 'auto', value: 600, count: 0, desc: "自動再生 +600/秒" },
+            { id: 13, name: "大物YouTuberコラボ", icon: "🤝", baseCost: 300000, type: 'click', value: 1000, count: 0, desc: "クリック力 +1000" },
+            { id: 14, name: "オリジナル楽曲リリース", icon: "🎵", baseCost: 600000, type: 'auto', value: 2500, count: 0, desc: "自動再生 +2500/秒" },
+            { id: 15, name: "3Dライブ開催！", icon: "🌟", baseCost: 1200000, type: 'auto', value: 5000, count: 0, desc: "自動再生 +5000/秒" }
+        ];
 
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-    }
+        const viewsDisplay = document.getElementById("views");
+        const vpsDisplay = document.getElementById("vps");
+        const clickPowerDisplay = document.getElementById("click-power-display");
+        const progressFill = document.getElementById("progress-fill");
+        const progressText = document.getElementById("progress-text");
+        const mainBtn = document.getElementById("main-btn");
+        const upgradesContainer = document.getElementById("upgrades-container");
+        const clearModal = document.getElementById("clear-modal");
 
-    // ビープ音
-    function playBeep(freq, duration, vol) {
-      try {
-        initAudio();
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        osc.type = "sine";
-        var volume = (vol || 0.2) * getVolume();
-        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch (e) {}
-    }
+        // スマホでのタッチイベントでも反応を良くするための処理
+        mainBtn.addEventListener("pointerdown", (e) => {
+            views += clickPower;
+            createClickParticle(e);
+            updateUI();
+            checkGoal();
+        });
 
-    // 各種効果音
-    var SOUNDS = {
-      click: function () { playBeep(660, 0.05, 0.12); },
-      combo: function (level) { playBeep(800 + level * 100, 0.1, 0.18); },
-      countdown: function () { playBeep(440, 0.08, 0.1); },
-      finish: function () {
-        try {
-          initAudio();
-          var notes = [523, 659, 784, 1047];
-          for (var i = 0; i < notes.length; i++) {
-            (function (f, t) {
-              var osc = audioCtx.createOscillator();
-              var gain = audioCtx.createGain();
-              osc.connect(gain);
-              gain.connect(audioCtx.destination);
-              osc.frequency.value = f;
-              gain.gain.setValueAtTime(0.2 * getVolume(), audioCtx.currentTime + t);
-              gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + t + 0.12);
-              osc.start(audioCtx.currentTime + t);
-              osc.stop(audioCtx.currentTime + t + 0.12);
-            })(notes[i], i * 0.1);
-          }
-        } catch (e) {}
-      }
-    };
+        function createClickParticle(e) {
+            const particle = document.createElement('div');
+            particle.className = 'click-particle';
+            particle.innerText = `+${clickPower}`;
+            
+            const rect = mainBtn.getBoundingClientRect();
+            // ポインターの座標からボタン内の相対位置を計算
+            const x = e.clientX - rect.left - 20 + (Math.random() * 40 - 20); 
+            const y = e.clientY - rect.top - 20;
 
-    // ============================================
-    // 3. DOM参照
-    // ============================================
-    var scoreEl = document.getElementById("score-value");
-    var timerEl = document.getElementById("timer-value");
-    var comboEl = document.getElementById("combo-value");
-    var clickBtn = document.getElementById("click-btn");
-    var startBtn = document.getElementById("start-btn");
-    var resultScreen = document.getElementById("result");
-    var finalScoreEl = document.getElementById("final-score");
-    var maxComboEl = document.getElementById("max-combo");
-    var playAgainBtn = document.getElementById("play-again-btn");
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            mainBtn.appendChild(particle);
 
-    // ============================================
-    // 4. ゲームの状態
-    // ============================================
-    var game = {
-      score: 0,
-      timeLeft: 10,
-      combo: 1,
-      maxCombo: 1,
-      lastClickTime: 0,
-      isPlaying: false,
-      isGameOver: false,
-      timerInterval: null
-    };
-
-    // ============================================
-    // 5. UI更新
-    // ============================================
-    function updateUI() {
-      scoreEl.textContent = game.score;
-      timerEl.textContent = game.timeLeft;
-      comboEl.textContent = "x" + game.combo;
-      if (game.combo >= 3) {
-        comboEl.classList.add("combo-active");
-      } else {
-        comboEl.classList.remove("combo-active");
-      }
-    }
-
-    // ============================================
-    // 6. クリック処理
-    // ============================================
-    function handleClick() {
-      if (!game.isPlaying || game.isGameOver) return;
-
-      var now = Date.now();
-      var timeSinceLast = now - game.lastClickTime;
-
-      // コンボ判定（0.5秒以内ならコンボ継続）
-      if (timeSinceLast < 500 && timeSinceLast > 0) {
-        game.combo = Math.min(game.combo + 1, 5);
-        if (game.combo > game.maxCombo) {
-          game.maxCombo = game.combo;
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
         }
-        if (game.combo >= 2) {
-          SOUNDS.combo(game.combo);
+
+        // コスト計算（買うたびに1.15倍になる）
+        function getUpgradeCost(index) {
+            const u = upgrades[index];
+            return Math.floor(u.baseCost * Math.pow(1.15, u.count));
         }
-      } else {
-        game.combo = 1;
-      }
 
-      game.lastClickTime = now;
-      game.score += game.combo;
-      SOUNDS.click();
-      updateUI();
+        function buyUpgrade(index) {
+            const cost = getUpgradeCost(index);
+            if (views >= cost) {
+                views -= cost;
+                upgrades[index].count += 1;
+                recalculateStats();
+                renderUpgrades();
+                updateUI();
+            }
+        }
 
-      // 押したときのアニメーション
-      clickBtn.style.transform = "scale(0.92)";
-      setTimeout(function () {
-        clickBtn.style.transform = "";
-      }, 80);
-    }
+        // ステータス再計算
+        function recalculateStats() {
+            let newVps = 0;
+            let newClickPower = 1; // 初期クリック力は1
 
-    // ============================================
-    // 7. ゲーム開始
-    // ============================================
-    function startGame() {
-      game.score = 0;
-      game.timeLeft = 10;
-      game.combo = 1;
-      game.maxCombo = 1;
-      game.lastClickTime = 0;
-      game.isPlaying = true;
-      game.isGameOver = false;
+            upgrades.forEach(u => {
+                if (u.type === 'click') {
+                    newClickPower += u.value * u.count;
+                } else if (u.type === 'auto') {
+                    newVps += u.value * u.count;
+                }
+            });
 
-      startBtn.classList.add("hidden");
-      resultScreen.classList.add("hidden");
-      clickBtn.classList.remove("hidden");
+            vps = newVps;
+            clickPower = newClickPower;
+        }
 
-      updateUI();
+        function updateUI() {
+            viewsDisplay.innerText = Math.floor(views).toLocaleString();
+            vpsDisplay.innerText = vps.toFixed(1);
+            clickPowerDisplay.innerText = clickPower.toLocaleString();
 
-      // カウントダウンタイマー
-      game.timerInterval = setInterval(function () {
-        game.timeLeft--;
+            let progress = (views / GOAL_VIEWS) * 100;
+            if (progress > 100) progress = 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.innerText = `${progress.toFixed(2)}%`;
+
+            // 購入可能なボタンの判定
+            const btns = document.querySelectorAll('.upgrade-btn');
+            btns.forEach((btn, index) => {
+                const cost = getUpgradeCost(index);
+                btn.disabled = views < cost;
+            });
+        }
+
+        // アップグレードリストの描画
+        function renderUpgrades() {
+            upgradesContainer.innerHTML = '';
+            upgrades.forEach((u, index) => {
+                const cost = getUpgradeCost(index);
+                const btn = document.createElement('button');
+                btn.className = 'upgrade-btn';
+                btn.onclick = () => buyUpgrade(index);
+
+                btn.innerHTML = `
+                    <div class="upgrade-icon">${u.icon}</div>
+                    <div class="upgrade-info">
+                        <h3>${u.name}</h3>
+                        <div class="upgrade-cost">${cost.toLocaleString()} 再生</div>
+                        <div class="upgrade-desc">${u.desc}</div>
+                    </div>
+                    <div class="upgrade-count">${u.count}</div>
+                `;
+                upgradesContainer.appendChild(btn);
+            });
+        }
+
+        function checkGoal() {
+            if (views >= GOAL_VIEWS && !isCleared) {
+                isCleared = true;
+                clearModal.style.display = 'flex';
+            }
+        }
+
+        function continueGame() {
+            clearModal.style.display = 'none';
+        }
+
+        // 自動再生のループ
+        setInterval(() => {
+            if (vps > 0) {
+                views += vps / 30;
+                updateUI();
+                checkGoal();
+            }
+        }, 1000 / 30);
+
+        // 初期化
+        renderUpgrades();
         updateUI();
 
-        if (game.timeLeft <= 3 && game.timeLeft > 0) {
-          SOUNDS.countdown();
-        }
-
-        if (game.timeLeft <= 0) {
-          endGame();
-        }
-      }, 1000);
-    }
-
-    // ============================================
-    // 8. ゲーム終了
-    // ============================================
-    function endGame() {
-      game.isPlaying = false;
-      game.isGameOver = true;
-      clearInterval(game.timerInterval);
-      game.timerInterval = null;
-
-      finalScoreEl.textContent = game.score;
-      maxComboEl.textContent = "x" + game.maxCombo;
-      resultScreen.classList.remove("hidden");
-      clickBtn.classList.add("hidden");
-      startBtn.classList.remove("hidden");
-
-      SOUNDS.finish();
-    }
-
-    // ============================================
-    // 9. イベント登録
-    // ============================================
-    clickBtn.addEventListener("click", handleClick);
-    clickBtn.addEventListener("touchstart", function (e) {
-      e.preventDefault();
-      handleClick();
-    });
-
-    startBtn.addEventListener("click", startGame);
-    playAgainBtn.addEventListener("click", startGame);
-
-    // キーボードでもクリック可能に
-    document.addEventListener("keydown", function (e) {
-      if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        if (game.isPlaying && !game.isGameOver) {
-          handleClick();
-        } else if (!game.isPlaying && !game.isGameOver) {
-          startGame();
-        }
-      }
-    });
-  </script>
+    </script>
 </body>
 </html>
