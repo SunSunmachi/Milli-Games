@@ -75,6 +75,15 @@ html, body {
   height: 100% !important;
 }
 
+#video-fade-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
 #video-status-bar {
   display: flex;
   align-items: center;

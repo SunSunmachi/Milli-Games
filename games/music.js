@@ -58,8 +58,10 @@
   var laneFlash = [0, 0, 0, 0];
   var laneHeld = [false, false, false, false];
   var holdActive = [null, null, null, null];
-  var chart = null, noteIdx = 0, gameEndCountdown = 0;
+  var chart = null, noteIdx = 0;
   var flickTracker = [null, null, null, null];
+  var fadeOutActive = false, fadeOutStart = 0;
+  var FADE_DURATION = 3.0;
 
   // ============================================
   // YouTube API
@@ -84,7 +86,7 @@
           elStatusText.textContent = "再生してスタートできます";
         },
         onStateChange: function (e) {
-          if (e.data === YT.PlayerState.ENDED && running) {
+          if (e.data === YT.PlayerState.ENDED && running && !fadeOutActive) {
             endGame();
           }
         },
@@ -338,12 +340,30 @@
       }
     }
 
-    // 終了判定
-    var lastNoteTime = chart.notes.length > 0 ? chart.notes[chart.notes.length - 1].t : 0;
-    if (chartTime > lastNoteTime + 2) {
-      gameEndCountdown++;
-      if (gameEndCountdown > 60) {
+    // フェードアウト / 終了判定
+    if (!fadeOutActive) {
+      var duration = (chart && chart.duration) ? chart.duration : 109;
+      var lastNoteTime = chart.notes.length > 0 ? chart.notes[chart.notes.length - 1].t : 0;
+      if (chartTime >= duration || (chartTime > lastNoteTime + 2 && judgedNotes >= totalNotes)) {
+        startFadeOut();
+      }
+    }
+
+    if (fadeOutActive) {
+      var fadeElapsed = chartTime - fadeOutStart;
+      var fadeProgress = Math.min(1, fadeElapsed / FADE_DURATION);
+
+      try { player.setVolume(Math.round((1 - fadeProgress) * 100)); } catch (e) {}
+
+      var videoFade = document.getElementById("video-fade-overlay");
+      if (videoFade) videoFade.style.opacity = fadeProgress;
+
+      if (fadeProgress >= 1) {
+        fadeOutActive = false;
+        running = false;
+        try { player.pauseVideo(); } catch (e) {}
         endGame();
+        return;
       }
     }
   }
@@ -505,6 +525,14 @@
       }
     }
     ctx.globalAlpha = 1;
+
+    // フェードアウトオーバーレイ
+    if (fadeOutActive) {
+      var fadeElapsed = chartTime - fadeOutStart;
+      var fadeProgress = Math.min(1, fadeElapsed / FADE_DURATION);
+      ctx.fillStyle = "rgba(0,0,0," + fadeProgress + ")";
+      ctx.fillRect(0, 0, cw, ch);
+    }
 
     // プログレスバー
     if (running && chart && chart.notes.length > 0) {
@@ -684,6 +712,14 @@
     update();
     draw();
     animId = requestAnimationFrame(gameLoop);
+  }
+
+  // ============================================
+  // フェードアウト
+  // ============================================
+  function startFadeOut() {
+    fadeOutActive = true;
+    fadeOutStart = chartTime;
   }
 
   // ============================================

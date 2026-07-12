@@ -237,7 +237,7 @@ var CHART = (function () {
   push(bar(37) + beat(3), 3, "tap");
 
   // ========================================
-  // OUTRO (bar 38-40) フェードアウト
+  // OUTRO (bar 38-40)
   // ========================================
   // bar 38
   push(bar(38) + beat(0), 0, "tap");
@@ -249,12 +249,154 @@ var CHART = (function () {
   push(bar(39) + beat(2), 2, "tap");
   push(bar(39) + beat(3), 1, "tap");
 
+  // ========================================
+  // CHORUS C (bar 40-47) 変化サビ
+  // ========================================
+  // bar 40
+  push(bar(40) + beat(0), 0, "tap");
+  push(bar(40) + beat(0.5), 2, "tap");
+  push(bar(40) + beat(1), 1, "flick");
+  push(bar(40) + beat(1.5), 3, "tap");
+  push(bar(40) + beat(2), 0, "hold", beat(0.5));
+  push(bar(40) + beat(2.5), 2, "tap");
+  push(bar(40) + beat(3), 1, "tap");
+  push(bar(40) + beat(3.5), 3, "flick");
+  // bar 41
+  push(bar(41) + beat(0), 0, "tap");
+  push(bar(41) + beat(1), 2, "hold", beat(1));
+  push(bar(41) + beat(2), 1, "tap");
+  push(bar(41) + beat(3), 3, "flick");
+  // bar 42
+  push(bar(42) + beat(0), 2, "tap");
+  push(bar(42) + beat(0.5), 0, "flick");
+  push(bar(42) + beat(1), 3, "hold", beat(0.5));
+  push(bar(42) + beat(1.5), 1, "tap");
+  push(bar(42) + beat(2), 2, "tap");
+  push(bar(42) + beat(3), 0, "flick");
+  // bar 43
+  push(bar(43) + beat(0), 1, "hold", beat(2));
+  push(bar(43) + beat(1), 3, "tap");
+  push(bar(43) + beat(2), 2, "tap");
+  push(bar(43) + beat(3), 0, "flick");
+  // bar 44
+  push(bar(44) + beat(0), 1, "tap");
+  push(bar(44) + beat(0.5), 3, "tap");
+  push(bar(44) + beat(1), 0, "tap");
+  push(bar(44) + beat(1.5), 2, "tap");
+  push(bar(44) + beat(2), 1, "flick");
+  push(bar(44) + beat(3), 3, "hold", beat(1));
+  // bar 45
+  push(bar(45) + beat(0), 0, "tap");
+  push(bar(45) + beat(0.5), 2, "tap");
+  push(bar(45) + beat(1), 1, "hold", beat(0.5));
+  push(bar(45) + beat(1.5), 3, "flick");
+  push(bar(45) + beat(2), 0, "tap");
+  push(bar(45) + beat(3), 2, "tap");
+  // bar 46
+  push(bar(46) + beat(0), 1, "tap");
+  push(bar(46) + beat(1), 3, "tap");
+  push(bar(46) + beat(2), 0, "hold", beat(1));
+  push(bar(46) + beat(3), 2, "flick");
+  // bar 47
+  push(bar(47) + beat(0), 1, "hold", beat(3));
+  push(bar(47) + beat(2), 3, "tap");
+  push(bar(47) + beat(3), 2, "tap");
+
+  // ========================================
+  // BREAK (bar 48-51) 一息
+  // ========================================
+  // bar 48
+  push(bar(48) + beat(0), 0, "hold", beat(2));
+  push(bar(48) + beat(1), 2, "tap");
+  push(bar(48) + beat(3), 1, "tap");
+  // bar 49
+  push(bar(49) + beat(0), 3, "hold", beat(2));
+  push(bar(49) + beat(1), 1, "tap");
+  push(bar(49) + beat(3), 0, "tap");
+  // bar 50
+  push(bar(50) + beat(0), 2, "tap");
+  push(bar(50) + beat(1), 0, "tap");
+  push(bar(50) + beat(2), 3, "tap");
+  push(bar(50) + beat(3), 1, "tap");
+  // bar 51
+  push(bar(51) + beat(0), 2, "hold", beat(3));
+  push(bar(51) + beat(2), 0, "tap");
+  push(bar(51) + beat(3), 3, "tap");
+
+  // ========================================
+  // FINAL CHORUS (bar 52-59) ラスサビ
+  // ========================================
+  // bar 52
+  push(bar(52) + beat(0), 0, "tap");
+  push(bar(52) + beat(0.5), 2, "hold", beat(0.5));
+  push(bar(52) + beat(1), 1, "flick");
+  push(bar(52) + beat(1.5), 3, "tap");
+  push(bar(52) + beat(2), 0, "tap");
+  push(bar(52) + beat(3), 2, "flick");
+  // bar 53
+  push(bar(53) + beat(0), 1, "tap");
+  push(bar(53) + beat(0.5), 3, "tap");
+  push(bar(53) + beat(1), 0, "hold", beat(1));
+  push(bar(53) + beat(2), 2, "flick");
+  push(bar(53) + beat(3), 1, "tap");
+  // bar 54
+  push(bar(54) + beat(0), 3, "tap");
+  push(bar(54) + beat(0.5), 0, "tap");
+  push(bar(54) + beat(1), 2, "hold", beat(0.5));
+  push(bar(54) + beat(1.5), 1, "flick");
+  push(bar(54) + beat(2), 3, "tap");
+  push(bar(54) + beat(3), 0, "tap");
+  // bar 55
+  push(bar(55) + beat(0), 1, "hold", beat(2));
+  push(bar(55) + beat(1), 3, "flick");
+  push(bar(55) + beat(2), 2, "tap");
+  push(bar(55) + beat(3), 0, "tap");
+  // bar 56
+  push(bar(56) + beat(0), 1, "tap");
+  push(bar(56) + beat(0.5), 3, "tap");
+  push(bar(56) + beat(1), 0, "flick");
+  push(bar(56) + beat(1.5), 2, "tap");
+  push(bar(56) + beat(2), 1, "hold", beat(0.5));
+  push(bar(56) + beat(2.5), 3, "tap");
+  push(bar(56) + beat(3), 0, "flick");
+  push(bar(56) + beat(3.5), 2, "tap");
+  // bar 57
+  push(bar(57) + beat(0), 1, "hold", beat(1));
+  push(bar(57) + beat(1), 3, "flick");
+  push(bar(57) + beat(2), 2, "hold", beat(1));
+  push(bar(57) + beat(3), 0, "tap");
+  // bar 58
+  push(bar(58) + beat(0), 1, "tap");
+  push(bar(58) + beat(0.5), 3, "tap");
+  push(bar(58) + beat(1), 0, "hold", beat(0.5));
+  push(bar(58) + beat(1.5), 2, "flick");
+  push(bar(58) + beat(2), 1, "tap");
+  push(bar(58) + beat(3), 3, "tap");
+  // bar 59
+  push(bar(59) + beat(0), 0, "hold", beat(3));
+  push(bar(59) + beat(1), 2, "tap");
+  push(bar(59) + beat(2), 1, "tap");
+  push(bar(59) + beat(3), 3, "flick");
+
+  // ========================================
+  // ENDING (bar 60-61) フィニッシュ
+  // ========================================
+  // bar 60
+  push(bar(60) + beat(0), 0, "tap");
+  push(bar(60) + beat(1), 2, "tap");
+  push(bar(60) + beat(2), 1, "tap");
+  push(bar(60) + beat(3), 3, "tap");
+  // bar 61
+  push(bar(61) + beat(0), 0, "hold", beat(3));
+  push(bar(61) + beat(2), 2, "tap");
+
   notes.sort(function (a, b) { return a.t - b.t; });
 
   return {
     videoId: "MF4Yw8IS6og",
     bpm: BPM,
     offset: 0,
+    duration: 109,
     notes: notes
   };
 
