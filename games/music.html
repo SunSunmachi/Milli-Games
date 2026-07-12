@@ -67,7 +67,26 @@
           <div class="overlay-inner">
             <h2>Princess Viral</h2>
             <p class="overlay-artist">音ノ乃のの</p>
-            <p class="overlay-sub">ノーツが判定ラインに来たら<br>タイミングよくタップ！</p>
+
+            <!-- 難易度選択 -->
+            <div class="config-section">
+              <label class="config-label">難易度</label>
+              <div class="diff-buttons">
+                <button class="diff-btn" data-diff="easy">EASY</button>
+                <button class="diff-btn active" data-diff="normal">NORMAL</button>
+                <button class="diff-btn" data-diff="hard">HARD</button>
+              </div>
+            </div>
+
+            <!-- オフセット調整 -->
+            <div class="config-section">
+              <label class="config-label">ズレ調整 <span id="offset-value">0ms</span></label>
+              <div class="offset-row">
+                <input type="range" id="offset-slider" min="-300" max="300" value="0" step="10">
+                <button id="btn-test-sound" class="btn-small" title="テスト音を鳴らす">&#x1F50A;</button>
+              </div>
+            </div>
+
             <button id="btn-start" class="btn-primary">再生してスタート</button>
           </div>
         </div>

@@ -616,6 +616,8 @@ function generateSideContent() {
 
 // タッチイベント（カルーセル）
 el.track.addEventListener("touchstart", function (e) {
+  // リンクやボタン上でのタッチはドラッグ処理をスキップ
+  if (e.target.closest("a") || e.target.closest(".card-btn")) return;
   state.startY = e.touches[0].clientY;
   handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
 }, { passive: true });
@@ -623,18 +625,21 @@ el.track.addEventListener("touchstart", function (e) {
 el.track.addEventListener("touchmove", function (e) {
   var deltaY = Math.abs(e.touches[0].clientY - state.startY);
   var deltaX = Math.abs(e.touches[0].clientX - state.startX);
-  if (deltaX > deltaY) {
+  if (state.isDragging && deltaX > deltaY) {
     e.preventDefault();
     handleDragMove(e.touches[0].clientX);
   }
 }, { passive: false });
 
 el.track.addEventListener("touchend", function () {
+  if (!state.isDragging) return;
   handleDragEnd();
 });
 
 // マウスイベント（カルーセル）
 el.track.addEventListener("mousedown", function (e) {
+  // リンクやボタン上でのクリックはドラッグ処理をスキップ
+  if (e.target.closest("a") || e.target.closest(".card-btn")) return;
   handleDragStart(e.clientX, e.clientY);
   e.preventDefault();
 });

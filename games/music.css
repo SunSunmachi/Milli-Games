@@ -283,6 +283,107 @@ html, body {
   line-height: 1.8;
 }
 
+/* ===== 設定セクション ===== */
+.config-section {
+  margin-bottom: 14px;
+}
+
+.config-label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+#offset-value {
+  color: #bb86fc;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.diff-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.diff-btn {
+  flex: 1;
+  max-width: 90px;
+  padding: 6px 0;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.diff-btn.active {
+  border-color: #bb86fc;
+  background: rgba(187,134,252,0.2);
+  color: #bb86fc;
+}
+
+.offset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#offset-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  outline: none;
+}
+
+#offset-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #bb86fc;
+  cursor: pointer;
+  border: none;
+}
+
+#offset-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #bb86fc;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-small {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-small:active {
+  background: rgba(187,134,252,0.2);
+  border-color: #bb86fc;
+}
+
 /* ===== 操作ヒント ===== */
 #controls-hint {
   flex-shrink: 0;

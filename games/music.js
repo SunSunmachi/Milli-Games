@@ -44,6 +44,10 @@
   var elBtnRetry = document.getElementById("btn-retry");
   var elStatusText = document.getElementById("video-status");
   var laneButtons = document.querySelectorAll(".lane-btn");
+  var elOffsetSlider = document.getElementById("offset-slider");
+  var elOffsetValue = document.getElementById("offset-value");
+  var elTestSound = document.getElementById("btn-test-sound");
+  var diffBtns = document.querySelectorAll(".diff-btn");
 
   // ============================================
   // 状態
@@ -62,6 +66,27 @@
   var flickTracker = [null, null, null, null];
   var fadeOutActive = false, fadeOutStart = 0;
   var FADE_DURATION = 3.0;
+
+  // ============================================
+  // 設定（ユーザーが変更可能）
+  // ============================================
+  var config = {
+    difficulty: "normal",
+    userOffset: 0
+  };
+
+  function updateJudgment() {
+    switch (config.difficulty) {
+      case "easy":
+        PERFECT_RANGE = 0.060; GREAT_RANGE = 0.120; GOOD_RANGE = 0.180; MISS_THRESHOLD = 0.260;
+        break;
+      case "hard":
+        PERFECT_RANGE = 0.025; GREAT_RANGE = 0.050; GOOD_RANGE = 0.090; MISS_THRESHOLD = 0.160;
+        break;
+      default:
+        PERFECT_RANGE = 0.040; GREAT_RANGE = 0.080; GOOD_RANGE = 0.120; MISS_THRESHOLD = 0.200;
+    }
+  }
 
   // ============================================
   // YouTube API
@@ -140,6 +165,27 @@
       bestScore = score;
       localStorage.setItem("rhythmBestPrincess", bestScore);
       elBest.textContent = bestScore;
+    }
+  }
+
+  // ============================================
+  // 設定の読み込み/保存
+  // ============================================
+  function loadConfig() {
+    var savedDiff = localStorage.getItem("rhythmDifficulty");
+    if (savedDiff) {
+      config.difficulty = savedDiff;
+      diffBtns.forEach(function (b) {
+        b.classList.toggle("active", b.getAttribute("data-diff") === savedDiff);
+      });
+    }
+    updateJudgment();
+
+    var savedOffset = localStorage.getItem("rhythmOffset");
+    if (savedOffset !== null) {
+      config.userOffset = parseInt(savedOffset, 10);
+      elOffsetSlider.value = config.userOffset;
+      elOffsetValue.textContent = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
     }
   }
 
@@ -278,7 +324,7 @@
     // YouTubeから現在時刻を取得
     try {
       if (player && player.getCurrentTime) {
-        chartTime = player.getCurrentTime() - (chart.offset || 0);
+        chartTime = player.getCurrentTime() - (chart.offset || 0) + (config.userOffset / 1000);
       }
     } catch (e) {
       // プレーヤーがまだ使えない場合
@@ -723,6 +769,25 @@
   }
 
   // ============================================
+  // テスト音（オフセット調整用）
+  // ============================================
+  function playTestSound() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = "sine";
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } catch (e) {}
+  }
+
+  // ============================================
   // ゲーム制御
   // ============================================
   function startGame() {
@@ -815,6 +880,29 @@
   // ============================================
   // イベント登録
   // ============================================
+  // 難易度ボタン
+  for (var i = 0; i < diffBtns.length; i++) {
+    (function (btn) {
+      btn.addEventListener("click", function () {
+        diffBtns.forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        config.difficulty = btn.getAttribute("data-diff");
+        updateJudgment();
+        localStorage.setItem("rhythmDifficulty", config.difficulty);
+      });
+    })(diffBtns[i]);
+  }
+
+  // オフセットスライダー
+  elOffsetSlider.addEventListener("input", function () {
+    config.userOffset = parseInt(elOffsetSlider.value, 10);
+    elOffsetValue.textContent = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+    localStorage.setItem("rhythmOffset", config.userOffset);
+  });
+
+  // テスト音
+  elTestSound.addEventListener("click", playTestSound);
+
   elBtnStart.addEventListener("click", startGame);
   elBtnRetry.addEventListener("click", startGame);
 
@@ -829,6 +917,7 @@
   // 初期化
   // ============================================
   loadBest();
+  loadConfig();
   initCanvas();
 
   // 初期描画（待機画面）
