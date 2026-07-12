@@ -1,76 +1,115 @@
 /* ============================================
-   リズムゲーム - 固有スタイル
+   リズムゲーム スタイル
    ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* リード文（H1直下の説明） */
-.game-lead {
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #555;
-  margin-bottom: 1.5rem;
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+  background: #0d001a;
+  color: #fff;
 }
 
-/* スコアエリア */
-.score-area {
+/* ===== トップバー ===== */
+#top-bar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.5);
+  flex-shrink: 0;
+  height: 40px;
 }
 
-.score-box {
-  background: #1a0a2e;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  text-align: center;
-  min-width: 70px;
-}
-
-.score-label {
-  display: block;
-  font-size: 0.7rem;
+#back-link {
   color: #bb86fc;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.score-value {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.btn-new-game {
-  margin-left: auto;
-  background: #6200ea;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
+  text-decoration: none;
   font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
 }
 
-.btn-new-game:hover {
-  background: #3700b3;
+#back-link:hover { color: #d4a0ff; }
+
+#song-title {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 12px;
 }
 
-/* HUD */
-.game-hud {
+/* ===== 全体ラッパー ===== */
+#game-wrapper {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  height: calc(100vh - 40px);
+}
+
+/* ===== YouTube動画エリア ===== */
+#video-area {
+  position: relative;
+  width: 100%;
+  max-height: 220px;
+  flex-shrink: 0;
+  background: #000;
+}
+
+#player-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 220px;
+  overflow: hidden;
+}
+
+#player {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#player iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#video-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  background: rgba(255,255,255,0.05);
+}
+
+#video-status {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ===== ゲームエリア ===== */
+#game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+/* ===== HUD ===== */
+#hud-row {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
 }
 
 .hud-item {
-  background: #2d1b69;
-  border-radius: 6px;
-  padding: 0.3rem 0.7rem;
-  text-align: center;
   flex: 1;
+  text-align: center;
+  min-width: 0;
 }
 
 .hud-label {
@@ -83,19 +122,17 @@
 
 .hud-value {
   display: block;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
 }
 
-/* ゲームボード */
-.board-wrapper {
+/* ===== ゲームボード ===== */
+#board-wrapper {
+  flex: 1;
   position: relative;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  aspect-ratio: 2 / 3;
-  touch-action: none;
+  overflow: hidden;
+  min-height: 0;
 }
 
 #game-canvas {
@@ -103,13 +140,12 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  background: #0d001a;
-  border-radius: 8px;
   display: block;
+  touch-action: none;
 }
 
-/* レーンボタン */
-.lane-buttons {
+/* ===== レーンボタン ===== */
+#lane-buttons {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -122,118 +158,152 @@
 
 .lane-btn {
   flex: 1;
-  height: 50px;
+  height: 48px;
   border: none;
   border-radius: 0 0 6px 6px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.1s;
-  color: rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.08);
+  transition: background 0.08s;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 
-.lane-btn:first-child {
-  border-radius: 0 0 0 6px;
-}
+.lane-btn:first-child { border-radius: 0 0 0 6px; }
+.lane-btn:last-child { border-radius: 0 0 6px 0; }
 
-.lane-btn:last-child {
-  border-radius: 0 0 6px 0;
-}
-
-.lane-btn:active,
+.lane-btn.active,
 .lane-btn.pressed {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.2);
 }
 
-/* ゲームオーバーレイ */
-.game-overlay {
+/* ===== オーバーレイ ===== */
+.overlay {
   position: absolute;
   inset: 0;
-  background: rgba(13, 0, 26, 0.92);
-  border-radius: 8px;
+  background: rgba(13,0,26,0.92);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  animation: overlay-appear 0.3s ease;
+  animation: fadeIn 0.3s ease;
 }
 
-.game-overlay.active {
-  display: flex;
-}
+.overlay.active { display: flex; }
 
-@keyframes overlay-appear {
+@keyframes fadeIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
 
-.overlay-content {
+.overlay-inner {
   text-align: center;
-  padding: 1.5rem;
+  padding: 24px;
+  max-width: 320px;
 }
 
-.overlay-content h2 {
-  font-size: 1.75rem;
+.overlay-inner h2 {
+  font-size: 1.5rem;
   color: #bb86fc;
-  margin-bottom: 0.5rem;
+  margin-bottom: 4px;
 }
 
-.overlay-content p {
-  font-size: 1.1rem;
-  color: #d4c9a0;
-  margin-bottom: 0.75rem;
+.overlay-artist {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 12px;
 }
 
-.overlay-content .best-result {
-  font-size: 0.95rem;
-  color: #F1C40F;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.overlay-content .btn-primary {
-  margin-bottom: 0.5rem;
-}
-
-.result-detail {
+.overlay-sub {
   font-size: 0.85rem;
-  color: #ccc;
-  margin-bottom: 0.5rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
   line-height: 1.6;
 }
 
-/* レスポンシブ */
-@media (max-width: 500px) {
-  .board-wrapper {
-    border-radius: 6px;
-  }
-
-  #game-canvas {
-    border-radius: 6px;
-  }
+.overlay-score {
+  font-size: 1.2rem;
+  color: #d4c9a0;
+  margin-bottom: 8px;
 }
 
-@media (max-width: 360px) {
-  .score-area {
-    gap: 0.5rem;
-  }
+.overlay-score span { color: #fff; font-weight: 700; }
 
-  .score-box {
-    padding: 0.4rem 0.75rem;
-    min-width: 55px;
-  }
+.overlay-acc {
+  font-size: 1rem;
+  color: #F1C40F;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
 
-  .score-value {
-    font-size: 1rem;
-  }
+.overlay-best {
+  font-size: 0.9rem;
+  color: #ff6b9d;
+  margin-bottom: 16px;
+}
 
-  .score-label {
-    font-size: 0.6rem;
-  }
+.btn-primary {
+  display: inline-block;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #bb86fc, #6200ea);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(187,134,252,0.3);
+}
 
-  .lane-btn {
-    height: 40px;
-    font-size: 0.85rem;
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(187,134,252,0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+#result-judges {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 8px;
+  line-height: 1.8;
+}
+
+/* ===== 操作ヒント ===== */
+#controls-hint {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 6px;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.02);
+}
+
+#controls-hint kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.5);
+  font-family: inherit;
+  margin: 0 1px;
+}
+
+/* ===== レスポンシブ微調整 ===== */
+@media (max-width: 500px) {
+  #video-area {
+    max-height: 160px;
   }
+  #player-container {
+    max-height: 160px;
+  }
+  .lane-btn { height: 40px; font-size: 0.8rem; }
+  .hud-value { font-size: 0.85rem; }
+  .overlay-inner h2 { font-size: 1.3rem; }
 }
