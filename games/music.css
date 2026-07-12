@@ -384,6 +384,91 @@ html, body {
   border-color: #bb86fc;
 }
 
+/* ===== 曲選択 ===== */
+#song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.song-card {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.song-card:active {
+  background: rgba(187,134,252,0.15);
+  border-color: #bb86fc;
+}
+
+.song-card .song-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #bb86fc;
+  margin-bottom: 2px;
+}
+
+.song-card .song-artist {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 4px;
+}
+
+.song-card .song-meta {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ===== テキストボタン ===== */
+.btn-text {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-text:hover { color: #bb86fc; }
+.btn-text:active { color: #d4a0ff; }
+
+/* ===== リザルト ===== */
+.result-song-title {
+  font-size: 0.95rem;
+  color: #bb86fc;
+  margin-bottom: 2px;
+}
+
+.result-difficulty {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#offset-hud { display: none; }
+#offset-display { color: #bb86fc; font-size: 0.85rem; }
+
 /* ===== 操作ヒント ===== */
 #controls-hint {
   flex-shrink: 0;

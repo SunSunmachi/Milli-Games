@@ -3,7 +3,9 @@
    BPM: 134
    調整方法はファイル末尾を参照
    ============================================ */
-var CHART = (function () {
+var CHARTS = {};
+
+CHARTS.princess_viral = (function () {
   "use strict";
 
   var BPM = 134;

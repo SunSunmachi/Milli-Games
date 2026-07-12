@@ -6,6 +6,13 @@
   "use strict";
 
   // ============================================
+  // 曲リスト
+  // ============================================
+  var SONGS = [
+    { id: "princess_viral", title: "Princess Viral", artist: "音ノ乃のの", bpm: 134 }
+  ];
+
+  // ============================================
   // 定数
   // ============================================
   var LANE_COUNT = 4;
@@ -38,16 +45,27 @@
   var elResultJudges = document.getElementById("result-judges");
   var elFinalAccuracy = document.getElementById("final-accuracy");
   var elBestResult = document.getElementById("best-result");
+  var elSongSelectOverlay = document.getElementById("overlay-song-select");
   var elStartOverlay = document.getElementById("overlay-start");
   var elResultOverlay = document.getElementById("overlay-result");
   var elBtnStart = document.getElementById("btn-start");
   var elBtnRetry = document.getElementById("btn-retry");
+  var elBtnBackSelect = document.getElementById("btn-back-select");
+  var elBtnBackSelectResult = document.getElementById("btn-back-select-result");
   var elStatusText = document.getElementById("video-status");
   var laneButtons = document.querySelectorAll(".lane-btn");
   var elOffsetSlider = document.getElementById("offset-slider");
   var elOffsetValue = document.getElementById("offset-value");
+  var elOffsetDisplay = document.getElementById("offset-display");
+  var elOffsetHud = document.getElementById("offset-hud");
   var elTestSound = document.getElementById("btn-test-sound");
   var diffBtns = document.querySelectorAll(".diff-btn");
+  var elSongList = document.getElementById("song-list");
+  var elSongTitle = document.getElementById("song-title");
+  var elSettingsSongTitle = document.getElementById("settings-song-title");
+  var elSettingsSongArtist = document.getElementById("settings-song-artist");
+  var elResultSongTitle = document.getElementById("result-song-title");
+  var elResultDifficulty = document.getElementById("result-difficulty");
 
   // ============================================
   // 状態
@@ -66,6 +84,8 @@
   var flickTracker = [null, null, null, null];
   var fadeOutActive = false, fadeOutStart = 0;
   var FADE_DURATION = 3.0;
+  var selectedSongId = null;
+  var offsetToastTimer = 0;
 
   // ============================================
   // 設定（ユーザーが変更可能）
@@ -92,7 +112,17 @@
   // YouTube API
   // ============================================
   window.onYouTubeIframeAPIReady = function () {
-    var vid = (typeof CHART !== "undefined" && CHART) ? CHART.videoId : "MF4Yw8IS6og";
+    var vid = (typeof CHARTS !== "undefined" && selectedSongId && CHARTS[selectedSongId])
+      ? CHARTS[selectedSongId].videoId : "MF4Yw8IS6og";
+    createPlayer(vid);
+  };
+
+  function createPlayer(vid) {
+    if (player) {
+      try { player.destroy(); } catch (e) {}
+      player = null;
+      playerReady = false;
+    }
     player = new YT.Player("player", {
       height: "100%",
       width: "100%",
@@ -108,7 +138,7 @@
       events: {
         onReady: function () {
           playerReady = true;
-          elStatusText.textContent = "再生してスタートできます";
+          elStatusText.textContent = "再生準備完了";
         },
         onStateChange: function (e) {
           if (e.data === YT.PlayerState.ENDED && running && !fadeOutActive) {
@@ -120,7 +150,7 @@
         }
       }
     });
-  };
+  }
 
   (function loadYT() {
     var tag = document.createElement("script");
@@ -152,18 +182,26 @@
   }
 
   // ============================================
-  // スコア管理
+  // スコア管理（曲ごと）
   // ============================================
+  function bestKey(songId, diff) {
+    return "rhythmBest_" + songId + "_" + diff;
+  }
+
   function loadBest() {
-    var v = localStorage.getItem("rhythmBestPrincess");
+    if (!selectedSongId) { elBest.textContent = "0"; return; }
+    var key = bestKey(selectedSongId, config.difficulty);
+    var v = localStorage.getItem(key);
     bestScore = v ? parseInt(v, 10) : 0;
     elBest.textContent = bestScore;
   }
 
   function saveBest() {
+    if (!selectedSongId) return;
     if (score > bestScore) {
       bestScore = score;
-      localStorage.setItem("rhythmBestPrincess", bestScore);
+      var key = bestKey(selectedSongId, config.difficulty);
+      localStorage.setItem(key, bestScore);
       elBest.textContent = bestScore;
     }
   }
@@ -185,7 +223,8 @@
     if (savedOffset !== null) {
       config.userOffset = parseInt(savedOffset, 10);
       elOffsetSlider.value = config.userOffset;
-      elOffsetValue.textContent = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+      var label = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+      elOffsetValue.textContent = label;
     }
   }
 
@@ -207,14 +246,8 @@
       var n = chart.notes[noteIdx];
       if (n.t - chartTime > SCROLL_AHEAD + 0.5) break;
       activeNotes.push({
-        t: n.t,
-        l: n.l,
-        type: n.type,
-        d: n.d || 0,
-        hit: false,
-        judged: false,
-        held: false,
-        holdProgress: 0
+        t: n.t, l: n.l, type: n.type, d: n.d || 0,
+        hit: false, judged: false, held: false, holdProgress: 0
       });
       noteIdx++;
     }
@@ -236,32 +269,19 @@
   // ============================================
   function judgeNote(note, diff) {
     var absDiff = Math.abs(diff);
-    var judgeText = "";
-    var judgeColor = "";
-    var points = 0;
+    var judgeText = "", judgeColor = "", points = 0;
 
     if (absDiff <= PERFECT_RANGE) {
-      judgeText = "PERFECT";
-      judgeColor = "#F1C40F";
-      points = SCORE_PERFECT;
-      counts.perfect++;
+      judgeText = "PERFECT"; judgeColor = "#F1C40F"; points = SCORE_PERFECT; counts.perfect++;
     } else if (absDiff <= GREAT_RANGE) {
-      judgeText = "GREAT";
-      judgeColor = "#2ECC71";
-      points = SCORE_GREAT;
-      counts.great++;
+      judgeText = "GREAT"; judgeColor = "#2ECC71"; points = SCORE_GREAT; counts.great++;
     } else if (absDiff <= GOOD_RANGE) {
-      judgeText = "GOOD";
-      judgeColor = "#3498DB";
-      points = SCORE_GOOD;
-      counts.good++;
+      judgeText = "GOOD"; judgeColor = "#3498DB"; points = SCORE_GOOD; counts.good++;
     } else {
-      return; // outside range, no judgment
+      return;
     }
 
-    note.hit = true;
-    note.judged = true;
-    judgedNotes++;
+    note.hit = true; note.judged = true; judgedNotes++;
 
     if (points > 0) {
       if (note.type === "flick") points += FLICK_BONUS;
@@ -285,13 +305,9 @@
   }
 
   function autoMiss(note) {
-    note.judged = true;
-    judgedNotes++;
-    combo = 0;
-    counts.miss++;
+    note.judged = true; judgedNotes++; combo = 0; counts.miss++;
     updateHUD();
-    elJudge.textContent = "MISS";
-    elJudge.style.color = "#E74C3C";
+    elJudge.textContent = "MISS"; elJudge.style.color = "#E74C3C";
     spawnJudgeText("MISS", "#E74C3C", cw / 2, judgeY - 30, 0);
   }
 
@@ -299,15 +315,10 @@
   // エフェクト
   // ============================================
   function spawnHitEffect(x, y, color) {
-    for (var i = 0; i < 6; i++) {
-      var angle = (Math.PI * 2 / 6) * i + Math.random() * 0.5;
-      var speed = 2 + Math.random() * 3;
-      effects.push({
-        x: x, y: y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 1, color: color, r: 2 + Math.random() * 2
-      });
+    for (var i = 0; i < 8; i++) {
+      var angle = (Math.PI * 2 / 8) * i + Math.random() * 0.5;
+      var speed = 2 + Math.random() * 4;
+      effects.push({ x: x, y: y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1, color: color, r: 2 + Math.random() * 3 });
     }
   }
 
@@ -321,72 +332,51 @@
   function update() {
     if (!running) return;
 
-    // YouTubeから現在時刻を取得
     try {
       if (player && player.getCurrentTime) {
         chartTime = player.getCurrentTime() - (chart.offset || 0) + (config.userOffset / 1000);
       }
-    } catch (e) {
-      // プレーヤーがまだ使えない場合
-    }
+    } catch (e) {}
 
     spawnNotes();
     cleanupNotes();
 
-    // ノーツ位置更新 + 自動ミス判定
     for (var i = 0; i < activeNotes.length; i++) {
       var n = activeNotes[i];
       if (n.judged) continue;
-
       var diff = n.t - chartTime;
-
-      // ノーツが判定ラインを過ぎてMISS_RANGE以上離れたら自動ミス
-      if (diff < -MISS_THRESHOLD) {
-        autoMiss(n);
-      }
+      if (diff < -MISS_THRESHOLD) autoMiss(n);
     }
 
     for (var i = 0; i < activeNotes.length; i++) {
       var n = activeNotes[i];
       if (n.type !== "hold" || !n.hit || n.holdProgress >= 1) continue;
-
       if (laneHeld[n.l]) {
         n.holdProgress = Math.min(1, (chartTime - n.t) / n.d);
         if (n.holdProgress >= 1) {
-          score += HOLD_BONUS;
-          updateHUD();
+          score += HOLD_BONUS; updateHUD();
           spawnJudgeText("HOLD OK", "#2ECC71", cw / 2, judgeY - 55, 0);
           holdActive[n.l] = null;
         }
       }
     }
 
-    // エフェクト更新
     for (var i = effects.length - 1; i >= 0; i--) {
       var e = effects[i];
-      e.x += e.vx;
-      e.y += e.vy;
-      e.life -= 0.04;
-      if (e.life <= 0) { effects.splice(i, 1); }
+      e.x += e.vx; e.y += e.vy; e.life -= 0.04;
+      if (e.life <= 0) effects.splice(i, 1);
     }
 
-    // 判定テキスト更新
     for (var i = judgeTexts.length - 1; i >= 0; i--) {
       var jt = judgeTexts[i];
-      jt.y -= 0.8;
-      jt.life -= 0.02;
-      if (jt.life <= 0) { judgeTexts.splice(i, 1); }
+      jt.y -= 0.8; jt.life -= 0.02;
+      if (jt.life <= 0) judgeTexts.splice(i, 1);
     }
 
-    // レーンフラッシュ減衰
     for (var i = 0; i < LANE_COUNT; i++) {
-      if (laneFlash[i] > 0) {
-        laneFlash[i] *= 0.92;
-        if (laneFlash[i] < 0.01) laneFlash[i] = 0;
-      }
+      if (laneFlash[i] > 0) { laneFlash[i] *= 0.92; if (laneFlash[i] < 0.01) laneFlash[i] = 0; }
     }
 
-    // フェードアウト / 終了判定
     if (!fadeOutActive) {
       var duration = (chart && chart.duration) ? chart.duration : 109;
       var lastNoteTime = chart.notes.length > 0 ? chart.notes[chart.notes.length - 1].t : 0;
@@ -398,18 +388,13 @@
     if (fadeOutActive) {
       var fadeElapsed = chartTime - fadeOutStart;
       var fadeProgress = Math.min(1, fadeElapsed / FADE_DURATION);
-
       try { player.setVolume(Math.round((1 - fadeProgress) * 100)); } catch (e) {}
-
       var videoFade = document.getElementById("video-fade-overlay");
       if (videoFade) videoFade.style.opacity = fadeProgress;
-
       if (fadeProgress >= 1) {
-        fadeOutActive = false;
-        running = false;
+        fadeOutActive = false; running = false;
         try { player.pauseVideo(); } catch (e) {}
-        endGame();
-        return;
+        endGame(); return;
       }
     }
   }
@@ -427,14 +412,17 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, cw, ch);
 
+    // レーン背景色
+    for (var i = 0; i < LANE_COUNT; i++) {
+      ctx.fillStyle = i % 2 === 0 ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.005)";
+      ctx.fillRect(i * lw, 0, lw, ch);
+    }
+
     // レーン線
     ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     for (var i = 0; i <= LANE_COUNT; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * lw, 0);
-      ctx.lineTo(i * lw, ch);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(i * lw, 0); ctx.lineTo(i * lw, ch); ctx.stroke();
     }
 
     // レーンフラッシュ
@@ -446,19 +434,18 @@
     }
 
     // 判定ライン
-    ctx.beginPath();
-    ctx.moveTo(0, judgeY);
-    ctx.lineTo(cw, judgeY);
-    ctx.strokeStyle = "rgba(255,255,255,0.5)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, judgeY); ctx.lineTo(cw, judgeY);
+    ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, judgeY); ctx.lineTo(cw, judgeY);
+    ctx.strokeStyle = "rgba(187,134,252,0.2)"; ctx.lineWidth = 6; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(0, judgeY);
-    ctx.lineTo(cw, judgeY);
-    ctx.strokeStyle = "rgba(187,134,252,0.25)";
-    ctx.lineWidth = 6;
-    ctx.stroke();
+    // 判定ライングロー
+    var glowGrad = ctx.createLinearGradient(0, judgeY - 8, 0, judgeY + 8);
+    glowGrad.addColorStop(0, "rgba(187,134,252,0)");
+    glowGrad.addColorStop(0.5, "rgba(187,134,252,0.08)");
+    glowGrad.addColorStop(1, "rgba(187,134,252,0)");
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(0, judgeY - 8, cw, 16);
 
     // ビートパルス
     if (running && chart) {
@@ -473,9 +460,10 @@
       }
     }
 
-    // ノーツ描画
-    var noteW = lw * 0.65;
-    var noteH = ch * 0.035;
+    // ノーツ描画（ピル型）
+    var noteW = lw * 0.72;
+    var noteH = ch * 0.04;
+    var noteR = noteH / 2;
 
     for (var i = 0; i < activeNotes.length; i++) {
       var n = activeNotes[i];
@@ -484,7 +472,6 @@
 
       var diff = n.t - chartTime;
       var ny = judgeY - (diff / SCROLL_AHEAD) * judgeY;
-
       if (ny < -noteH * 2 || ny > ch + noteH * 2) continue;
 
       var nx = n.l * lw + lw / 2;
@@ -495,51 +482,59 @@
         var tailEnd = judgeY - ((n.t + n.d) - chartTime) / SCROLL_AHEAD * judgeY;
         var tailTop = Math.min(ny, tailEnd);
         var tailBottom = Math.max(ny, tailEnd);
-
         if (tailBottom > 0 && tailTop < ch) {
-          var holdColor = n.hit ? "rgba(187,134,252,0.8)" : "rgba(255,255,255,0.15)";
-          ctx.fillStyle = holdColor;
-          ctx.fillRect(nx - noteW * 0.3, Math.max(0, tailTop), noteW * 0.6, Math.min(ch, tailBottom) - Math.max(0, tailTop));
+          var tailGrad = ctx.createLinearGradient(0, tailTop, 0, tailBottom);
+          if (n.hit) {
+            tailGrad.addColorStop(0, "rgba(187,134,252,0.6)");
+            tailGrad.addColorStop(1, "rgba(187,134,252,0.2)");
+          } else {
+            tailGrad.addColorStop(0, "rgba(255,255,255,0.15)");
+            tailGrad.addColorStop(1, "rgba(255,255,255,0.04)");
+          }
+          ctx.fillStyle = tailGrad;
+          ctx.beginPath();
+          roundRect(ctx, nx - noteW * 0.3, Math.max(0, tailTop), noteW * 0.6, Math.min(ch, tailBottom) - Math.max(0, tailTop), noteR * 0.3);
+          ctx.fill();
         }
       }
 
-      // ノーツ本体
       ctx.save();
 
-      // 影
-      ctx.beginPath();
-      roundRect(ctx, nx - noteW / 2 + 2, ny - noteH / 2 + 2, noteW, noteH, 4);
-      ctx.fillStyle = "rgba(0,0,0,0.3)";
-      ctx.fill();
+      // グロー
+      if (!n.judged || (n.type === "hold" && n.hit)) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10 + 6 * (ny < judgeY ? (judgeY - ny) / judgeY : 0);
+      }
 
-      // 本体
+      // ピル本体
       ctx.beginPath();
-      roundRect(ctx, nx - noteW / 2, ny - noteH / 2, noteW, noteH, 4);
+      roundRect(ctx, nx - noteW / 2, ny - noteH / 2, noteW, noteH, noteR);
       var nGrad = ctx.createLinearGradient(0, ny - noteH / 2, 0, ny + noteH / 2);
-      nGrad.addColorStop(0, lighten(color, 40));
-      nGrad.addColorStop(1, color);
+      nGrad.addColorStop(0, lighten(color, 50));
+      nGrad.addColorStop(0.4, color);
+      nGrad.addColorStop(1, darken(color, 30));
       ctx.fillStyle = nGrad;
       ctx.fill();
 
-      // ハイライト
+      ctx.shadowBlur = 0;
+
+      // トップの光沢ライン
       ctx.beginPath();
-      roundRect(ctx, nx - noteW / 2 + 3, ny - noteH / 2 + 2, noteW - 6, noteH * 0.35, 2);
-      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      roundRect(ctx, nx - noteW / 2 + 4, ny - noteH / 2 + 2, noteW - 8, noteH * 0.3, noteR * 0.3);
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
       ctx.fill();
 
       // フリック矢印
       if (n.type === "flick") {
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
-        ctx.font = "bold " + Math.round(noteH * 0.8) + "px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("▶", nx, ny);
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        ctx.font = "bold " + Math.round(noteH * 0.7) + "px sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("▶", nx, ny + 1);
       } else if (n.type === "hold") {
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.font = "bold " + Math.round(noteH * 0.6) + "px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("▼", nx - 1, ny);
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.font = "bold " + Math.round(noteH * 0.55) + "px sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("▼", nx - 1, ny + 1);
       }
 
       ctx.restore();
@@ -549,10 +544,8 @@
     for (var i = 0; i < effects.length; i++) {
       var e = effects[i];
       ctx.globalAlpha = e.life;
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, e.r * e.life, 0, Math.PI * 2);
-      ctx.fillStyle = e.color;
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(e.x, e.y, e.r * e.life, 0, Math.PI * 2);
+      ctx.fillStyle = e.color; ctx.fill();
     }
     ctx.globalAlpha = 1;
 
@@ -591,12 +584,23 @@
         ctx.fillRect(0, 0, cw * progress, 3);
       }
     }
+
+    // オフセットトースト（プレイ中に表示）
+    if (offsetToastTimer > 0) {
+      offsetToastTimer--;
+      ctx.fillStyle = "rgba(187,134,252,0.85)";
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+      var label = "OFFSET " + (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+      ctx.fillText(label, cw / 2, 24);
+    }
   }
 
   // ============================================
   // 描画ヘルパー
   // ============================================
   function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
     ctx.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -623,6 +627,13 @@
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
+  function darken(hex, amt) {
+    var r = Math.max(0, parseInt(hex.slice(1, 3), 16) - amt);
+    var g = Math.max(0, parseInt(hex.slice(3, 5), 16) - amt);
+    var b = Math.max(0, parseInt(hex.slice(5, 7), 16) - amt);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
   // ============================================
   // ヒット処理
   // ============================================
@@ -631,60 +642,37 @@
 
     laneFlash[lane] = 1;
     laneHeld[lane] = true;
-
-    // フリック検出用に開始位置を記録
     flickTracker[lane] = { x: 0, t: performance.now() };
 
-    // 最も近い未ヒットノーツを探す
-    var closest = null;
-    var closestDist = Infinity;
+    var closest = null, closestDist = Infinity;
     for (var i = 0; i < activeNotes.length; i++) {
       var n = activeNotes[i];
       if (n.l !== lane || n.judged) continue;
       var diff = Math.abs(n.t - chartTime);
-      if (diff < closestDist) {
-        closestDist = diff;
-        closest = n;
-      }
+      if (diff < closestDist) { closestDist = diff; closest = n; }
     }
 
     if (!closest || closestDist > GOOD_RANGE + 0.02) return;
 
-    // フリックノーツの場合
-    if (closest.type === "flick") {
-      // PCではタップで代用
-      judgeNote(closest, closest.t - chartTime);
-      return;
-    }
-
-    // ホールドノーツの場合
+    if (closest.type === "flick") { judgeNote(closest, closest.t - chartTime); return; }
     if (closest.type === "hold") {
       judgeNote(closest, closest.t - chartTime);
-      if (closest.judged) {
-        holdActive[lane] = { note: closest };
-      }
+      if (closest.judged) holdActive[lane] = { note: closest };
       return;
     }
-
-    // タップノーツ
     judgeNote(closest, closest.t - chartTime);
   }
 
   function releaseLane(lane) {
     if (!running) return;
-
     laneHeld[lane] = false;
 
-    // ホールドノーツの終了処理
     if (holdActive[lane]) {
-      var h = holdActive[lane];
-      var n = h.note;
+      var h = holdActive[lane], n = h.note;
       if (n && n.hit && n.holdProgress < 1) {
         var completion = n.holdProgress;
         if (completion > 0.8) {
-          // 80%以上ホールドできた → ボーナス
-          score += HOLD_BONUS;
-          updateHUD();
+          score += HOLD_BONUS; updateHUD();
           spawnJudgeText("HOLD OK", "#2ECC71", cw / 2, judgeY - 55, 0);
         } else {
           spawnJudgeText("HOLD BREAK", "#E74C3C", cw / 2, judgeY - 55, 0);
@@ -694,13 +682,9 @@
       holdActive[lane] = null;
     }
 
-    // フリック検出（指を離したときの速度）
     if (flickTracker[lane]) {
       var elapsed = performance.now() - flickTracker[lane].t;
-      if (elapsed > 200) {
-        flickTracker[lane] = null;
-        return; // ゆっくり離した → フリックじゃない
-      }
+      if (elapsed > 200) { flickTracker[lane] = null; return; }
       flickTracker[lane] = null;
     }
   }
@@ -710,17 +694,37 @@
   // ============================================
   document.addEventListener("keydown", function (e) {
     var idx = LANE_KEYS.indexOf(e.code);
-    if (idx !== -1) {
-      e.preventDefault();
-      hitLane(idx);
+    if (idx !== -1) { e.preventDefault(); hitLane(idx); }
+
+    // プレイ中のオフセット調整
+    if (running) {
+      var step = e.shiftKey ? 50 : 10;
+      if (e.code === "BracketLeft" || e.code === "Minus") {
+        e.preventDefault();
+        config.userOffset = Math.max(-300, config.userOffset - step);
+        elOffsetSlider.value = config.userOffset;
+        var label = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+        elOffsetValue.textContent = label;
+        elOffsetDisplay.textContent = label;
+        localStorage.setItem("rhythmOffset", config.userOffset);
+        offsetToastTimer = 60;
+      }
+      if (e.code === "BracketRight" || e.code === "Equal") {
+        e.preventDefault();
+        config.userOffset = Math.min(300, config.userOffset + step);
+        elOffsetSlider.value = config.userOffset;
+        var label = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+        elOffsetValue.textContent = label;
+        elOffsetDisplay.textContent = label;
+        localStorage.setItem("rhythmOffset", config.userOffset);
+        offsetToastTimer = 60;
+      }
     }
   });
 
   document.addEventListener("keyup", function (e) {
     var idx = LANE_KEYS.indexOf(e.code);
-    if (idx !== -1) {
-      releaseLane(idx);
-    }
+    if (idx !== -1) releaseLane(idx);
   });
 
   // ============================================
@@ -729,24 +733,10 @@
   for (var i = 0; i < laneButtons.length; i++) {
     (function (btn) {
       var lane = parseInt(btn.getAttribute("data-lane"), 10);
-      btn.addEventListener("pointerdown", function (e) {
-        e.preventDefault();
-        btn.classList.add("pressed");
-        hitLane(lane);
-      });
-      btn.addEventListener("pointerup", function (e) {
-        e.preventDefault();
-        btn.classList.remove("pressed");
-        releaseLane(lane);
-      });
-      btn.addEventListener("pointerleave", function (e) {
-        btn.classList.remove("pressed");
-        releaseLane(lane);
-      });
-      btn.addEventListener("pointercancel", function (e) {
-        btn.classList.remove("pressed");
-        releaseLane(lane);
-      });
+      btn.addEventListener("pointerdown", function (e) { e.preventDefault(); btn.classList.add("pressed"); hitLane(lane); });
+      btn.addEventListener("pointerup", function (e) { e.preventDefault(); btn.classList.remove("pressed"); releaseLane(lane); });
+      btn.addEventListener("pointerleave", function (e) { btn.classList.remove("pressed"); releaseLane(lane); });
+      btn.addEventListener("pointercancel", function (e) { btn.classList.remove("pressed"); releaseLane(lane); });
     })(laneButtons[i]);
   }
 
@@ -763,28 +753,87 @@
   // ============================================
   // フェードアウト
   // ============================================
-  function startFadeOut() {
-    fadeOutActive = true;
-    fadeOutStart = chartTime;
-  }
+  function startFadeOut() { fadeOutActive = true; fadeOutStart = chartTime; }
 
   // ============================================
-  // テスト音（オフセット調整用）
+  // テスト音
   // ============================================
   function playTestSound() {
     try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      osc.type = "sine";
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.1);
+      var actx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = actx.createOscillator();
+      var gain = actx.createGain();
+      osc.connect(gain); gain.connect(actx.destination);
+      osc.frequency.value = 880; osc.type = "sine";
+      gain.gain.setValueAtTime(0.2, actx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.1);
+      osc.start(actx.currentTime); osc.stop(actx.currentTime + 0.1);
     } catch (e) {}
+  }
+
+  // ============================================
+  // 曲選択
+  // ============================================
+  function showSongSelect() {
+    elSongSelectOverlay.classList.add("active");
+    elStartOverlay.classList.remove("active");
+    elResultOverlay.classList.remove("active");
+  }
+
+  function selectSong(songId) {
+    selectedSongId = songId;
+    var song = null;
+    for (var i = 0; i < SONGS.length; i++) {
+      if (SONGS[i].id === songId) { song = SONGS[i]; break; }
+    }
+    if (!song) return;
+
+    elSongTitle.textContent = song.title + " / " + song.artist;
+    elSettingsSongTitle.textContent = song.title;
+    elSettingsSongArtist.textContent = song.artist;
+
+    // この曲の難しい度別ベストスコアを表示
+    loadBest();
+
+    elSongSelectOverlay.classList.remove("active");
+    elStartOverlay.classList.add("active");
+    elResultOverlay.classList.remove("active");
+
+    // YouTubeプレーヤーを切り替え
+    if (typeof CHARTS !== "undefined" && CHARTS[songId]) {
+      var chartData = CHARTS[songId];
+      if (typeof YT !== "undefined" && YT.Player) {
+        createPlayer(chartData.videoId);
+      } else {
+        // API未ロード - onYouTubeIframeAPIReadyで処理済み or 後で処理
+      }
+    }
+  }
+
+  function buildSongList() {
+    var html = "";
+    for (var i = 0; i < SONGS.length; i++) {
+      var s = SONGS[i];
+      var chartData = (typeof CHARTS !== "undefined" && CHARTS[s.id]) ? CHARTS[s.id] : null;
+      var noteCount = chartData ? chartData.notes.length : "?";
+      html +=
+        '<button class="song-card" data-song="' + s.id + '">' +
+        '<span class="song-title">' + s.title + '</span>' +
+        '<span class="song-artist">' + s.artist + '</span>' +
+        '<span class="song-meta">BPM ' + s.bpm + ' &middot; ' + noteCount + 'ノーツ</span>' +
+        '</button>';
+    }
+    elSongList.innerHTML = html;
+
+    // クリックイベント
+    var cards = elSongList.querySelectorAll(".song-card");
+    for (var i = 0; i < cards.length; i++) {
+      (function (card) {
+        card.addEventListener("click", function () {
+          selectSong(card.getAttribute("data-song"));
+        });
+      })(cards[i]);
+    }
   }
 
   // ============================================
@@ -792,54 +841,45 @@
   // ============================================
   function startGame() {
     if (!player || !playerReady) {
-      elStatusText.textContent = "プレーヤーの準備中です...";
+      elStatusText.textContent = "YouTubeプレーヤー準備中... しばらくお待ちください";
+      // ボタンを点滅させて視覚的なフィードバック
+      elBtnStart.style.opacity = "0.5";
+      setTimeout(function () { elBtnStart.style.opacity = "1"; }, 300);
       return;
     }
 
-    if (typeof CHART === "undefined" || !CHART) {
+    if (!selectedSongId || typeof CHARTS === "undefined" || !CHARTS[selectedSongId]) {
       elStatusText.textContent = "譜面データの読み込みに失敗しました";
       return;
     }
 
     initCanvas();
 
-    score = 0;
-    combo = 0;
-    maxCombo = 0;
-    noteIdx = 0;
-    judgedNotes = 0;
-    accuracyTotal = 0;
-    accuracyMax = 0;
+    offsetToastTimer = 0;
+    score = 0; combo = 0; maxCombo = 0;
+    noteIdx = 0; judgedNotes = 0; accuracyTotal = 0; accuracyMax = 0;
     counts = { perfect: 0, great: 0, good: 0, miss: 0 };
-    activeNotes = [];
-    effects = [];
-    judgeTexts = [];
-    laneFlash = [0, 0, 0, 0];
-    laneHeld = [false, false, false, false];
-    holdActive = [null, null, null, null];
-    flickTracker = [null, null, null, null];
-    gameEndCountdown = 0;
+    activeNotes = []; effects = []; judgeTexts = [];
+    laneFlash = [0, 0, 0, 0]; laneHeld = [false, false, false, false];
+    holdActive = [null, null, null, null]; flickTracker = [null, null, null, null];
     chartTime = 0;
-    chart = CHART;
+    fadeOutActive = false;
+
+    chart = CHARTS[selectedSongId];
     totalNotes = chart.notes.length;
 
     updateHUD();
-    elScore.textContent = "0";
-    elCombo.textContent = "0";
-    elJudge.textContent = "-";
-    elJudge.style.color = "#fff";
+    elScore.textContent = "0"; elCombo.textContent = "0";
+    elJudge.textContent = "-"; elJudge.style.color = "#fff";
     elAccuracy.textContent = "100%";
+    elOffsetHud.style.display = "";
 
     elStartOverlay.classList.remove("active");
     elResultOverlay.classList.remove("active");
 
-    running = true;
-    started = true;
+    running = true; started = true;
 
-    try {
-      player.seekTo(0);
-      player.playVideo();
-    } catch (e) {}
+    try { player.seekTo(0); player.playVideo(); } catch (e) {}
 
     if (animId) cancelAnimationFrame(animId);
     gameLoop();
@@ -848,12 +888,16 @@
   function endGame() {
     running = false;
     if (animId) { cancelAnimationFrame(animId); animId = null; }
-
     try { player.pauseVideo(); } catch (e) {}
-
     saveBest();
 
+    elOffsetHud.style.display = "none";
     elFinalScore.textContent = score;
+
+    var diffLabel = config.difficulty.toUpperCase();
+    elResultSongTitle.textContent = chart ? chart.title || "" : "";
+    elResultDifficulty.textContent = diffLabel;
+
     elResultJudges.innerHTML =
       "PERFECT: " + counts.perfect + "<br>" +
       "GREAT: " + counts.great + "<br>" +
@@ -869,7 +913,7 @@
     elFinalAccuracy.textContent = "ACCURACY: " + acc + "%";
 
     if (score >= bestScore && score > 0) {
-      elBestResult.textContent = "🎉 ハイスコア更新！";
+      elBestResult.textContent = "NEW BEST!";
     } else {
       elBestResult.textContent = "ベスト: " + bestScore;
     }
@@ -880,6 +924,9 @@
   // ============================================
   // イベント登録
   // ============================================
+  // 曲選択リスト生成
+  buildSongList();
+
   // 難易度ボタン
   for (var i = 0; i < diffBtns.length; i++) {
     (function (btn) {
@@ -889,6 +936,8 @@
         config.difficulty = btn.getAttribute("data-diff");
         updateJudgment();
         localStorage.setItem("rhythmDifficulty", config.difficulty);
+        loadBest();
+        elResultDifficulty.textContent = config.difficulty.toUpperCase();
       });
     })(diffBtns[i]);
   }
@@ -896,21 +945,33 @@
   // オフセットスライダー
   elOffsetSlider.addEventListener("input", function () {
     config.userOffset = parseInt(elOffsetSlider.value, 10);
-    elOffsetValue.textContent = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+    var label = (config.userOffset >= 0 ? "+" : "") + config.userOffset + "ms";
+    elOffsetValue.textContent = label;
+    elOffsetDisplay.textContent = label;
     localStorage.setItem("rhythmOffset", config.userOffset);
   });
 
   // テスト音
   elTestSound.addEventListener("click", playTestSound);
 
+  // スタート
   elBtnStart.addEventListener("click", startGame);
+
+  // リトライ
   elBtnRetry.addEventListener("click", startGame);
 
+  // 曲選択に戻る
+  elBtnBackSelect.addEventListener("click", function () {
+    elStartOverlay.classList.remove("active");
+    showSongSelect();
+  });
+  elBtnBackSelectResult.addEventListener("click", function () {
+    elResultOverlay.classList.remove("active");
+    showSongSelect();
+  });
+
   window.addEventListener("resize", function () {
-    if (!running) {
-      initCanvas();
-      draw();
-    }
+    if (!running) { initCanvas(); draw(); }
   });
 
   // ============================================
@@ -920,7 +981,7 @@
   loadConfig();
   initCanvas();
 
-  // 初期描画（待機画面）
+  // 初期描画
   (function () {
     initCanvas();
     var grad = ctx.createLinearGradient(0, 0, 0, ch);
@@ -928,6 +989,10 @@
     grad.addColorStop(1, "#1a0a2e");
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, cw, ch);
+    ctx.fillStyle = "rgba(255,255,255,0.1)";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("曲を選択してください", cw / 2, ch / 2);
   })();
 
 })();

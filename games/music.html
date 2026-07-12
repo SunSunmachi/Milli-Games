@@ -9,7 +9,7 @@
 <body>
   <div id="top-bar">
     <a href="../index.html" id="back-link">&larr; Milli Games</a>
-    <span id="song-title">Princess Viral / 音ノ乃のの</span>
+    <span id="song-title">曲を選択してください</span>
   </div>
 
   <div id="game-wrapper">
@@ -48,6 +48,10 @@
           <span class="hud-label">ACCURACY</span>
           <span class="hud-value" id="accuracy">100%</span>
         </div>
+        <div class="hud-item" id="offset-hud" style="display:none">
+          <span class="hud-label">OFFSET</span>
+          <span class="hud-value" id="offset-display">0ms</span>
+        </div>
       </div>
 
       <!-- ゲームボード -->
@@ -62,13 +66,20 @@
           <button class="lane-btn" data-lane="3">K</button>
         </div>
 
-        <!-- スタート画面 -->
-        <div id="overlay-start" class="overlay active">
+        <!-- 曲選択画面 -->
+        <div id="overlay-song-select" class="overlay active">
           <div class="overlay-inner">
-            <h2>Princess Viral</h2>
-            <p class="overlay-artist">音ノ乃のの</p>
+            <h2>曲を選択</h2>
+            <div class="song-list" id="song-list"></div>
+          </div>
+        </div>
 
-            <!-- 難易度選択 -->
+        <!-- 設定画面 -->
+        <div id="overlay-start" class="overlay">
+          <div class="overlay-inner">
+            <h2 id="settings-song-title">Princess Viral</h2>
+            <p class="overlay-artist" id="settings-song-artist">音ノ乃のの</p>
+
             <div class="config-section">
               <label class="config-label">難易度</label>
               <div class="diff-buttons">
@@ -78,7 +89,6 @@
               </div>
             </div>
 
-            <!-- オフセット調整 -->
             <div class="config-section">
               <label class="config-label">ズレ調整 <span id="offset-value">0ms</span></label>
               <div class="offset-row">
@@ -88,6 +98,7 @@
             </div>
 
             <button id="btn-start" class="btn-primary">再生してスタート</button>
+            <button id="btn-back-select" class="btn-text">曲を選び直す</button>
           </div>
         </div>
 
@@ -95,18 +106,23 @@
         <div id="overlay-result" class="overlay">
           <div class="overlay-inner">
             <h2>リザルト</h2>
+            <div id="result-header">
+              <p id="result-song-title" class="result-song-title">Princess Viral</p>
+              <p class="result-difficulty" id="result-difficulty">NORMAL</p>
+            </div>
             <p class="overlay-score">スコア: <span id="final-score">0</span></p>
             <div id="result-judges"></div>
             <p class="overlay-acc" id="final-accuracy">ACCURACY: 0%</p>
             <p class="overlay-best" id="best-result"></p>
             <button id="btn-retry" class="btn-primary">もう一度遊ぶ</button>
+            <button id="btn-back-select-result" class="btn-text">曲を選び直す</button>
           </div>
         </div>
       </div>
 
       <!-- 操作説明 -->
       <div id="controls-hint">
-        PC: <kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> &nbsp;|&nbsp; スマホ: 下のボタンをタップ
+        PC: <kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> &nbsp;|&nbsp; <kbd>[</kbd> <kbd>]</kbd> オフセット
       </div>
     </div>
   </div>
