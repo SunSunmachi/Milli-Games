@@ -1095,17 +1095,25 @@ ul, ol { list-style: none; }
     flex-shrink: 0;
     position: sticky;
     top: 80px;
+    margin-top: 80px;
     align-self: start;
     display: block !important;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
   }
 
-  .menu-info-section {
-    display: none;
+  #side-panel::-webkit-scrollbar { width: 4px; }
+  #side-panel::-webkit-scrollbar-track { background: transparent; }
+  #side-panel::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 4px;
   }
 
-  #side-menu {
-    display: none;
-  }
+  .menu-info-section { display: none; }
+
+  #side-menu { display: none; }
 
   #side-panel .panel-section {
     background: rgba(255, 255, 255, 0.2);
@@ -1114,6 +1122,10 @@ ul, ol { list-style: none; }
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  #side-panel .panel-section:last-child {
     margin-bottom: 0;
   }
 
@@ -1134,33 +1146,15 @@ ul, ol { list-style: none; }
     -webkit-backdrop-filter: none !important;
   }
 
-  .game-card.active {
-    transform: scale(1.05);
-  }
+  .game-card.active { transform: scale(1.05); }
 
-  .carousel-arrow {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .carousel-arrow.visible {
-    opacity: 1;
-  }
-
+  .carousel-arrow { opacity: 1; pointer-events: auto; }
+  .carousel-arrow.visible { opacity: 1; }
   #carousel-prev { left: -8px; }
   #carousel-next { right: -8px; }
-
-  #carousel-container {
-    padding: 16px 0;
-  }
-
-  .card-title {
-    font-size: 1.25rem;
-  }
-
-  .card-description {
-    font-size: 0.88rem;
-  }
+  #carousel-container { padding: 16px 0; }
+  .card-title { font-size: 1.25rem; }
+  .card-description { font-size: 0.88rem; }
 }
 
 /* ===== 大画面 ===== */
